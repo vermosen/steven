@@ -1,2 +1,1 @@
-# steven
-A package to study Heston models
+### steven - a C++ framework to study Heston Processes

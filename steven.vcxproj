@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
+    <Text Include="cmake\CMakeLists.txt" />
+    <Text Include="docs\CMakeLists.txt" />
+    <Text Include="python\package\CMakeLists.txt" />
+    <Text Include="R\package\CMakeLists.txt" />
+    <Text Include="src\steven\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PreLoad.cmake" />
+    <None Include="README.md" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{05376550-B43A-40B6-99E9-361E168C140A}</ProjectGuid>
+    <Keyword>Linux</Keyword>
+    <RootNamespace>steven</RootNamespace>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <ApplicationType>Linux</ApplicationType>
+    <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
+    <TargetLinuxPlatform>Generic</TargetLinuxPlatform>
+    <LinuxProjectType>{FC1A4D80-50E9-41DA-9192-61C0DBAA00D2}</LinuxProjectType>
+    <kProjectPath>/steven</kProjectPath>
+    <ProjectName>steven</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(GIT_ROOT)\utils\visualstudio\cmake-home-v3.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <BuildCommandLine>$(R_DEFAULT_BUILD)</BuildCommandLine>
+    <CleanCommandLine>$(R_DEFAULT_CLEANUP)</CleanCommandLine>
+    <NMakeIncludeSearchPath>$(CONAN_DATA)\eigen\3.3.7\jvermosen\stable\package\c09bd06b25a18a19d5ece56575bd1c2d34d87142\include\eigen3;$(CONAN_DATA)\pfr\1.0.0\jvermosen\stable\package\5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9\include;C:\.conan\_5mi8kji\1\include;$(ProjectDir)src;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <LocalRemoteCopySources>false</LocalRemoteCopySources>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <CleanCommandLine>$(R_DEFAULT_CLEANUP)</CleanCommandLine>
+    <BuildCommandLine>$(R_DEFAULT_BUILD)</BuildCommandLine>
+    <NMakeIncludeSearchPath>$(CONAN_DATA)\eigen\3.3.7\jvermosen\stable\package\c09bd06b25a18a19d5ece56575bd1c2d34d87142\include\eigen3;$(CONAN_DATA)\pfr\1.0.0\jvermosen\stable\package\5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9\include;C:\.conan\_5mi8kji\1\include;$(ProjectDir)src;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PreBuildEvent>
+      <Command>$(R_DEFAULT_PREBUILD)</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+        @ECHO ON
+        set node=
+        call :getNode node $(RemoteTarget)
+        $(R_DEFAULT_POSTBUILD_LIB)
+        EXIT /B
+        :getNode
+        set %~1=%~3
+        goto:EOF</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PostBuildEvent>
+      <Command>
+        @ECHO ON
+        set node=
+        call :getNode node $(RemoteTarget)
+        $(R_DEFAULT_POSTBUILD_LIB)
+        EXIT /B
+        :getNode
+        set %~1=%~3
+        goto:EOF</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

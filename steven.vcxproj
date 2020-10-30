@@ -17,8 +17,13 @@
     <Text Include="python\package\CMakeLists.txt" />
     <Text Include="R\package\CMakeLists.txt" />
     <Text Include="src\steven\CMakeLists.txt" />
+    <Text Include="tests\CMakeLists.txt" />
+    <Text Include="tests\python\CMakeLists.txt" />
+    <Text Include="tests\R\CMakeLists.txt" />
+    <Text Include="tests\steven\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="cmake\module\utils.cmake" />
     <None Include="PreLoad.cmake" />
     <None Include="README.md" />
   </ItemGroup>

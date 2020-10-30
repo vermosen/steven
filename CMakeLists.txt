@@ -36,7 +36,7 @@ PROJECT(
 	${PROJECT_NAME}
 	LANGUAGES C CXX CUDA
 	VERSION	${${PROJECT_NAME_U}_VERSION}
-	DESCRIPTION "the steven lib"
+	DESCRIPTION "steven - a library to study Heston model"
 )
 
 ##############################
@@ -46,23 +46,15 @@ PROJECT(
 set(GTEST_VERS     "1.8.1" )
 set(RCPP_VERS      "1.0.4" )
 set(PYBIND11_VERS  "2.5.0" )
-set(EIGEN_VERS     "3.3.7" )
-set(FFTW_VERS      "3.3.8" )
-set(BOOST_VERS     "1.72.0")
 set(DOXYGEN_VERS   "1.8.18")
-set(NFFT_VERS      "3.5.2" )
-set(RCPPUTILS_VERS "0.1.3" )
+set(QUANTLIB_VERS  "1.14.0")
 
 set(PACKAGES
    rcpp
    gtest
    pybind11
-   eigen
-   fftw
-   boost
    doxygen
-   nfft
-   RcppUtils
+   quantlib
 )
 
 message(STATUS "package list has been set to ${PACKAGES}")
@@ -71,8 +63,8 @@ message(STATUS "package list has been set to ${PACKAGES}")
 load_packages(
 	NAME ${PACKAGES}
 	PROFILE ${CONAN_PROFILE}
-	SETTINGS ${CONAN_EXTRA_SETTINGS}
-	OPTIONS fftw:precision=double # switch to float if needed....
+	SETTINGS "${CONAN_EXTRA_SETTINGS};build_type=${CMAKE_BUILD_TYPE}"
+	OPTIONS ""
 	UPDATE
 )
 
@@ -115,4 +107,4 @@ endif()
 # add the test suite to the project #
 #####################################
 
-add_testsuite(DIRECTORY test)
+add_testsuite(DIRECTORY tests)

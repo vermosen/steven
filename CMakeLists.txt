@@ -47,7 +47,8 @@ set(GTEST_VERS     "1.8.1" )
 set(RCPP_VERS      "1.0.4" )
 set(PYBIND11_VERS  "2.5.0" )
 set(DOXYGEN_VERS   "1.8.18")
-set(QUANTLIB_VERS  "1.14.0")
+set(QUANTLIB_VERS  "1.20.0")
+set(META_VERS      "0.1.7" )
 
 set(PACKAGES
    rcpp
@@ -55,6 +56,7 @@ set(PACKAGES
    pybind11
    doxygen
    quantlib
+   meta
 )
 
 message(STATUS "package list has been set to ${PACKAGES}")

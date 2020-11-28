@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.13)
 
-option(OTOS-DOCS "create the sphinx documentation of the project" OFF)
+option(STEVEN-DOCS "create the sphinx documentation of the project" ON)
 
 set(PROJECT_HOME "${CMAKE_CURRENT_LIST_DIR}")
 set(PROJECT_NAME steven CACHE STRING "" FORCE)
@@ -100,7 +100,6 @@ add_subdirectory(python/package)
 # breathe does not seem to work for now on ...
 # compare to project 
 # https://github.com/PCMSolver/pcmsolver
-
 if (STEVEN-DOCS)
 	add_subdirectory(docs)
 endif()

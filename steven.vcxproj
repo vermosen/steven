@@ -14,6 +14,7 @@
     <Text Include="CMakeLists.txt" />
     <Text Include="cmake\CMakeLists.txt" />
     <Text Include="docs\CMakeLists.txt" />
+    <Text Include="docs\sphinx\CMakeLists.txt" />
     <Text Include="python\package\CMakeLists.txt" />
     <Text Include="R\package\CMakeLists.txt" />
     <Text Include="src\steven\CMakeLists.txt" />
@@ -25,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="cmake\module\utils.cmake" />
+    <None Include="docs\Doxyfile.in" />
     <None Include="LICENSE" />
     <None Include="PreLoad.cmake" />
     <None Include="README.md" />

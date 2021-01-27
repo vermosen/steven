@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.13)
 
-set(TARGET_NAME test_helloworld)
+set(TARGET_NAME test_deamericanize)
 
 setup_component(TARGET ${TARGET_NAME})
 

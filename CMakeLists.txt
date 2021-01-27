@@ -90,7 +90,7 @@ add_subdirectory(src/steven)
 #    add the project applications   #
 #####################################
 
-add_subdirectory(R/package)
+#add_subdirectory(R/package)
 add_subdirectory(python/package)
 
 #####################################

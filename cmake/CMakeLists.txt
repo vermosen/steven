@@ -2,80 +2,57 @@ cmake_minimum_required (VERSION 3.13)
 
 include_guard(GLOBAL)
 
-message(STATUS   "\n")
-message(STATUS   ":==================================:")
-message(STATUS   ":setting global cmake configuration:")
-message(STATUS   ":==================================:\n")
-
-message(STATUS "*** configuration set to \"${CMAKE_BUILD_TYPE}\" ***")
+message(STATUS "\n")
+message(STATUS ":==================================:")
+message(STATUS ":setting global cmake configuration:")
+message(STATUS ":==================================:\n")
 
 # must be defined before the module get imported
 set(INSTALL_BINARY_SUFFIX bin/${CMAKE_BUILD_TYPE})
 set(INSTALL_LIBRARY_SUFFIX lib/${CMAKE_BUILD_TYPE})
 set(INSTALL_INCLUDE_SUFFIX include)
 
-message(DEBUG "INSTALL_BINARY_SUFFIX set to ${INSTALL_BINARY_SUFFIX}")
-message(DEBUG "INSTALL_LIBRARY_SUFFIX set to ${INSTALL_LIBRARY_SUFFIX}")
-message(DEBUG "INSTALL_INCLUDE_SUFFIX set to ${INSTALL_INCLUDE_SUFFIX}")
+#install prefix
+if(DEFINED CMAKE_INSTALL_PREFIX)
+	message(STATUS "installation path set to ${CMAKE_INSTALL_PREFIX}")
+else()
+	set(CMAKE_INSTALL_PREFIX "${PROJECT_HOME}")
+	message(STATUS "defaulting installation path to ${CMAKE_INSTALL_PREFIX}")
+endif()
 
 # load the utils module
 include("${CMAKE_CURRENT_LIST_DIR}/module/utils.cmake")
 
-find_conan(
-    BINDIR ${CONAN_BIN_PATH}
-    REQUIRES 1.12.0 
-)
-
-# enable the languages
-enable_language(C CXX CUDA)
-
-# set dialect
-set(CMAKE_CXX_STANDARD ${CXX_DIALECT})
-
 # set verbosity
-if(VERBOSE)
-    set(CMAKE_VERBOSE_MAKEFILE ON)
+if(CMAKE_VERBOSE)
+	message(DEBUG "extra compiler logging...")
+	set(CMAKE_VERBOSE_MAKEFILE ON CACHE BOOL "flag to force make/ninja to display compiler commands")
 endif()
 
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-message(STATUS "THREADS_PREFER_PTHREAD_FLAG value: ${THREADS_PREFER_PTHREAD_FLAG}")
-FIND_PACKAGE(Threads)
+# conan setup 
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+	message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+	set(CONAN_FILE_URL https://github.com/conan-io/cmake-conan/raw/v0.15/conan.cmake)
+	file(DOWNLOAD "${CONAN_FILE_URL}" "${CMAKE_BINARY_DIR}/conan.cmake")
+endif()
 
-# set the compiler flags
-message(STATUS "CMAKE_BUILD_TYPE set to ${CMAKE_BUILD_TYPE}")
+include(${CMAKE_BINARY_DIR}/conan.cmake)
+conan_check(VERSION 1.12.0 REQUIRED)
 
-# set the PIC/PIE flag
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-message(STATUS "CMAKE_POSITION_INDEPENDENT_CODE set to ${CMAKE_POSITION_INDEPENDENT_CODE}")
+# enable the languages & set the dialect
+enable_language(C CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# check for LTO support
-if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
-
-    include(CheckIPOSupported)
-    check_ipo_supported(RESULT LTO_SUPPORTED)
-        
-    if(LTO_SUPPORTED)
-	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+# enable lto
+include(CheckIPOSupported)
+check_ipo_supported(RESULT LTO_SUPPORTED)
+		
+if (${CMAKE_BUILD_TYPE} STREQUAL "Release")      
+  if(LTO_SUPPORTED)
+		set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 	endif()
 endif()
 
-# TODO: fix
-message(DEBUG "looking for python environment in ${PYTHON_LOCATION_HINT}")
-#import_python(HINT ${PYTHON_LOCATION_HINT})
-
-# build flags
-if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -DDEBUG -g")
-    
-elseif(${CMAKE_BUILD_TYPE} STREQUAL "Profiling")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg -O3 -DNDEBUG")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg -O3 -DNDEBUG")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg -O3 -DNDEBUG")
-
-elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG")
-endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-backtrace-limit=50")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+find_package(Threads)

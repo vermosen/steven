@@ -3,10 +3,10 @@
 import os, sys
 import unittest
 
-class test_settings(unittest.TestCase):
+class test_time(unittest.TestCase):
 
   def __init__(self, *args, **kwargs):
-    super(test_settings, self).__init__(*args, **kwargs)
+    super(test_time, self).__init__(*args, **kwargs)
     pass
 
   def test_set_date(self):
@@ -40,6 +40,20 @@ class test_settings(unittest.TestCase):
     self.assertEqual(result.year, d.year)
     self.assertEqual(result.month, d.month)
     self.assertEqual(result.day, d.day)
+
+  def test_print_date(self):
+
+    from steven import date
+    
+    d = date(2021, 1, 1)
+    self.assertEqual(d.__str__(), '2021-01-01')
+
+  def test_create_us_calendar(self):
+
+    from steven.calendars import unitedstates
+    
+    cal = unitedstates()
+    self.assertIsInstance(cal, unitedstates)
 
 if __name__ == '__main__':
   unittest.main()

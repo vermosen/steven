@@ -7,7 +7,7 @@
 #include <pybind11/stl.h>
 
 #include <ql/settings.hpp>
-#include <ql/userconfig.hpp>
+#include <ql/time/calendars/unitedstates.hpp>
 
 namespace ql = QuantLib;
 
@@ -40,6 +40,17 @@ PYBIND11_MODULE(_steven, m) {
 
         return ss.str();
     })
+    ;
+
+  py::class_<ql::Calendar, std::shared_ptr<ql::Calendar>>(m, "calendar")
+    ;
+
+  py::class_<
+      ql::UnitedStates
+    , std::shared_ptr<ql::UnitedStates>
+    , ql::Calendar
+  >(m, "unitedstates")
+    .def(py::init<>())
     ;
 
   // access settings

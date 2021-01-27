@@ -6,7 +6,7 @@ def main():
 
   dt = date(2021, 1, 10)
   set_evaluation_date(dt)
-  dt = get_evaluation_date()
+  print(get_evaluation_date())
 
 if __name__ == '__main__':
   main()

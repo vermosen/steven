@@ -14,4 +14,4 @@ set_tests_properties(steven.python.package.import
 	ENVIRONMENT "PYTHONPATH=${PYTHONPATH_TESTSUITE}"
 )
 
-add_subdirectory(settings)
+add_subdirectory(time)

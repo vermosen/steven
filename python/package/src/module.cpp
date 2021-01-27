@@ -19,6 +19,23 @@ PYBIND11_MODULE(_steven, m) {
 
   m.doc() = "heston model bindings";
 
+  py::enum_<ql::TimeUnit>(m, "timeunit")
+    .value("days"         , ql::TimeUnit::Days      )
+    .value("weeks"        , ql::TimeUnit::Weeks     )
+    .value("months"       , ql::TimeUnit::Months    )
+    .value("years"        , ql::TimeUnit::Years     )
+    .export_values()
+    ;
+
+  py::enum_<ql::BusinessDayConvention>(m, "businessdayconvention")
+    // ISDA only
+    .value("following"        , ql::BusinessDayConvention::Following        )
+    .value("modifiedfollowing", ql::BusinessDayConvention::ModifiedFollowing)
+    .value("preceding"        , ql::BusinessDayConvention::Preceding        )
+    .value("unadjusted"       , ql::BusinessDayConvention::Unadjusted       )
+    .export_values()
+    ;
+
   py::class_<ql::Date>(m, "date")
     .def(py::init<>([](int year, int month, int day) {
         return ql::Date(day, static_cast<ql::Month>(month), year);
@@ -43,6 +60,22 @@ PYBIND11_MODULE(_steven, m) {
     ;
 
   py::class_<ql::Calendar, std::shared_ptr<ql::Calendar>>(m, "calendar")
+    .def("advance", [](
+          const std::shared_ptr<ql::Calendar>& cal
+        , const ql::Date& dt
+        , int n
+        , ql::TimeUnit unit
+        , ql::BusinessDayConvention bdc
+        , bool eom) {
+
+        return cal->advance(dt, n, unit, bdc, eom);
+      }
+      , py::arg("date")
+      , py::arg("amount")
+      , py::arg("unit")
+      , py::arg("bdc")
+      , py::arg("eom") = false
+    )
     ;
 
   py::class_<

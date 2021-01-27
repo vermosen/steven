@@ -55,5 +55,16 @@ class test_time(unittest.TestCase):
     cal = unitedstates()
     self.assertIsInstance(cal, unitedstates)
 
+  def test_calendar_advance(self):
+
+    from steven import date, businessdayconvention, timeunit
+    from steven.calendars import unitedstates
+
+    cal = unitedstates()
+    res = cal.advance(date(2021, 1, 1), 3, timeunit.weeks, businessdayconvention.following)
+    self.assertEqual(res.day, 22)
+    self.assertEqual(res.year, 2021)
+    self.assertEqual(res.month, 1)
+
 if __name__ == '__main__':
   unittest.main()

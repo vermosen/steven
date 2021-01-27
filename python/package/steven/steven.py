@@ -6,9 +6,10 @@ if sys.version_info < (3, 9):
 else:
   from zoneinfo import ZoneInfo
 
-from ._steven import date
+from ._steven import date, timeunit, businessdayconvention
 from ._steven import set_evaluation_date, get_evaluation_date
 
 __all__ = [ 
-  'date', 'set_evaluation_date', 'get_evaluation_date'
+      'date', 'timeunit', 'businessdayconvention'
+    , 'set_evaluation_date', 'get_evaluation_date'
 ]

@@ -110,12 +110,12 @@ TEST(unittest, option_pricing) {
   //auto bsm = ql::ext::shared_ptr<ql::BlackScholesMertonProcess>(new ql::BlackScholesMertonProcess(
   //  /* ud= */100.0, div_ts, rt_ts, vol_ts);
 
-  //ql::Size timeSteps = static_cast<int>(std::max(700 * timeToMaturity_, 20.0));
+  //ql::Size steps = static_cast<int>(std::max(700 * timeToMaturity_, 20.0));
 
   // pricing engine
-	opt.setPricingEngine(
-		ql::ext::shared_ptr<ql::PricingEngine>(
-			new ql::BinomialVanillaEngine<ql::CoxRossRubinstein>(bsm, timeSteps)));
+	//opt.setPricingEngine(
+	//	ql::ext::shared_ptr<ql::PricingEngine>(
+	//		new ql::BinomialVanillaEngine<ql::CoxRossRubinstein>(bsm, steps)));
 
 }
 

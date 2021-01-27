@@ -7,7 +7,10 @@
 #include <pybind11/stl.h>
 
 #include <ql/settings.hpp>
+#include <ql/compounding.hpp>
 #include <ql/time/calendars/unitedstates.hpp>
+#include <ql/time/daycounters/actual360.hpp>
+#include <ql/time/daycounters/actual365fixed.hpp>
 
 namespace ql = QuantLib;
 
@@ -36,17 +39,32 @@ PYBIND11_MODULE(_steven, m) {
     .export_values()
     ;
 
+  py::enum_<ql::Compounding>(m, "compounding")
+    // ISDA only
+    .value("simple"              , ql::Compounding::Simple              )
+    .value("compounded"          , ql::Compounding::Compounded          )
+    .value("continuous"          , ql::Compounding::Continuous          )
+    .value("simplethencompounded", ql::Compounding::SimpleThenCompounded)
+    .value("compoundedthensimple", ql::Compounding::CompoundedThenSimple)
+    .export_values()
+    ;
+
   py::class_<ql::Date>(m, "date")
+    .def(py::init<>())
     .def(py::init<>([](int year, int month, int day) {
         return ql::Date(day, static_cast<ql::Month>(month), year);
       }
     ))
     .def_property_readonly("year" , &ql::Date::year)
+    .def_property_readonly("day"  , &ql::Date::dayOfMonth)
     .def_property_readonly("month", [](const ql::Date& dt) {
         return static_cast<int>(dt.month());
       }
     )
-    .def_property_readonly("day"  , &ql::Date::dayOfMonth)
+    .def("__eq__", [](const ql::Date& d1, const ql::Date& d2) { 
+        return d1 == d2; 
+      }
+    )
     .def("__str__", [](const ql::Date& dt) {
       std::stringstream ss; ss
         << std::setfill('0') 
@@ -59,16 +77,33 @@ PYBIND11_MODULE(_steven, m) {
     })
     ;
 
-  py::class_<ql::Calendar, std::shared_ptr<ql::Calendar>>(m, "calendar")
+  py::class_<ql::DayCounter>(m, "daycounter")
+    .def("yearfraction", &ql::DayCounter::yearFraction
+      , py::arg("start")
+      , py::arg("end")
+      , py::arg("refstart") = ql::Date()
+      , py::arg("refend") = ql::Date()
+    )
+    ;
+
+  py::class_<ql::Actual360, ql::DayCounter>(m, "actual360")
+    .def(py::init<>())
+    ;
+
+  py::class_<ql::Actual365Fixed, ql::DayCounter>(m, "actual365")
+    .def(py::init<>())
+    ;
+
+  py::class_<ql::Calendar>(m, "calendar")
     .def("advance", [](
-          const std::shared_ptr<ql::Calendar>& cal
+          const ql::Calendar& cal
         , const ql::Date& dt
         , int n
         , ql::TimeUnit unit
         , ql::BusinessDayConvention bdc
         , bool eom) {
 
-        return cal->advance(dt, n, unit, bdc, eom);
+        return cal.advance(dt, n, unit, bdc, eom);
       }
       , py::arg("date")
       , py::arg("amount")
@@ -80,7 +115,6 @@ PYBIND11_MODULE(_steven, m) {
 
   py::class_<
       ql::UnitedStates
-    , std::shared_ptr<ql::UnitedStates>
     , ql::Calendar
   >(m, "unitedstates")
     .def(py::init<>())

@@ -66,7 +66,7 @@ load_packages(
 	NAME ${PACKAGES}
 	PROFILE ${CMAKE_PROFILE}
 	SETTINGS "${CONAN_EXTRA_SETTINGS};build_type=${CMAKE_BUILD_TYPE}"
-	OPTIONS ""
+	OPTIONS "quantlib:use_std_shared_ptr=True;quantlib:use_std_unique_ptr=True"
 	UPDATE
 )
 

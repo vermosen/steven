@@ -66,5 +66,16 @@ class test_time(unittest.TestCase):
     self.assertEqual(res.year, 2021)
     self.assertEqual(res.month, 1)
 
+  def test_act360_yearfraction(self):
+
+    from steven import date, businessdayconvention, timeunit
+    from steven.daycounters import actual360
+
+    dc = actual360()
+    start = date(2020, 1, 1)
+    end = date(2021, 1, 1)
+    res = dc.yearfraction(start=start, end=end)
+    self.assertAlmostEqual(res, 1.016666666666)
+
 if __name__ == '__main__':
   unittest.main()

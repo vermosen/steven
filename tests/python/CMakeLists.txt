@@ -15,3 +15,4 @@ set_tests_properties(steven.python.package.import
 )
 
 add_subdirectory(time)
+add_subdirectory(termstructure)

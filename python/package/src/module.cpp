@@ -11,6 +11,7 @@
 #include <ql/time/calendars/unitedstates.hpp>
 #include <ql/time/daycounters/actual360.hpp>
 #include <ql/time/daycounters/actual365fixed.hpp>
+#include <ql/termstructures/yield/flatforward.hpp>
 
 namespace ql = QuantLib;
 
@@ -46,6 +47,14 @@ PYBIND11_MODULE(_steven, m) {
     .value("continuous"          , ql::Compounding::Continuous          )
     .value("simplethencompounded", ql::Compounding::SimpleThenCompounded)
     .value("compoundedthensimple", ql::Compounding::CompoundedThenSimple)
+    .export_values()
+    ;
+
+  py::enum_<ql::Frequency>(m, "frequency")
+    .value("annual"    , ql::Frequency::Annual    )
+    .value("semiannual", ql::Frequency::Semiannual)
+    .value("quarterly" , ql::Frequency::Quarterly )
+    .value("monthly"   , ql::Frequency::Monthly   )
     .export_values()
     ;
 
@@ -120,7 +129,7 @@ PYBIND11_MODULE(_steven, m) {
     .def(py::init<>())
     ;
 
-  // access settings
+  // access evaluation_date settings
   m.def("set_evaluation_date", [](const ql::Date& dt) {
       ql::Settings::instance().evaluationDate() = dt;
     }
@@ -133,4 +142,43 @@ PYBIND11_MODULE(_steven, m) {
     }
   )
   ;
+
+  py::class_<
+      ql::YieldTermStructure
+    , std::shared_ptr<ql::YieldTermStructure>
+  >(m, "yieldtermstructure")
+    .def("zerorate", [](
+          std::shared_ptr<ql::YieldTermStructure> ts
+        , const ql::Date& dt
+        , const ql::DayCounter& dc
+        , ql::Compounding c
+        , ql::Frequency freq
+        , bool extrapolate) -> double {
+        return ts->zeroRate(dt, dc, c, freq, extrapolate).rate();
+      }
+      , py::arg("date")
+      , py::arg("daycounter")
+      , py::arg("compounding")
+      , py::arg("frequency")
+      , py::arg("extrapolate") = false
+    )
+    ;
+
+  py::class_<
+      ql::FlatForward
+    , std::shared_ptr<ql::FlatForward>
+    , ql::YieldTermStructure
+  >(m, "flatforward")
+    .def(py::init<ql::Date, ql::Rate, ql::DayCounter, ql::Compounding>())
+    ;
+
+  // handles submodule
+  {
+    auto sub = m.def_submodule("_handles");
+
+    py::class_<ql::Handle<ql::YieldTermStructure>>(sub, "yieldtermstructure")
+      .def(py::init<std::shared_ptr<ql::YieldTermStructure>>())
+      .def("link", &ql::Handle<ql::YieldTermStructure>::currentLink)
+      ;
+  }
 }

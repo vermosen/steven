@@ -15,6 +15,7 @@
 #include <ql/termstructures/volatility/equityfx/blackconstantvol.hpp>
 #include <ql/pricingengines/vanilla/binomialengine.hpp>
 #include <ql/methods/lattices/binomialtree.hpp>
+#include <ql/processes/blackscholesprocess.hpp>
 
 namespace ql = QuantLib;
 
@@ -42,7 +43,7 @@ TEST(unittest, rate_vol_fit) {
   double vol = 1e-5;
   ql::DayCounter vol_dc = ql::Actual365Fixed();
 
-  auto vol_qt = ql::ext::shared_ptr<ql::SimpleQuote>(new ql::SimpleQuote(vol)); // can be updated
+  auto vol_qt = std::shared_ptr<ql::SimpleQuote>(new ql::SimpleQuote(vol)); // can be updated
   ql::Handle<ql::Quote> vol_hdl(vol_qt);
   
   ql::Handle<ql::BlackVolTermStructure> vol_ts(
@@ -106,9 +107,12 @@ TEST(unittest, option_pricing) {
   // setup
   ql::Settings::instance().evaluationDate() = pricing_date;
 
+  auto ud_quote = std::shared_ptr<ql::Quote>(new ql::SimpleQuote(100.0));
+
+  auto ud_hdl = ql::Handle<ql::Quote>(ud_quote);
+  
   // BSM process
-  //auto bsm = ql::ext::shared_ptr<ql::BlackScholesMertonProcess>(new ql::BlackScholesMertonProcess(
-  //  /* ud= */100.0, div_ts, rt_ts, vol_ts);
+  auto bsm = ql::ext::shared_ptr<ql::BlackScholesMertonProcess>(new ql::BlackScholesMertonProcess(ud_hdl, div_ts, rt_ts, vol_ts));
 
   //ql::Size steps = static_cast<int>(std::max(700 * timeToMaturity_, 20.0));
 

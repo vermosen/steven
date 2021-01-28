@@ -7,11 +7,16 @@
 #include <pybind11/stl.h>
 
 #include <ql/settings.hpp>
+#include <ql/exercise.hpp>
 #include <ql/compounding.hpp>
+#include <ql/quotes/simplequote.hpp>
+#include <ql/instruments/payoffs.hpp>
+#include <ql/instruments/vanillaoption.hpp>
 #include <ql/time/calendars/unitedstates.hpp>
 #include <ql/time/daycounters/actual360.hpp>
 #include <ql/time/daycounters/actual365fixed.hpp>
 #include <ql/termstructures/yield/flatforward.hpp>
+#include <ql/termstructures/volatility/equityfx/blackconstantvol.hpp>
 
 namespace ql = QuantLib;
 
@@ -55,6 +60,12 @@ PYBIND11_MODULE(_steven, m) {
     .value("semiannual", ql::Frequency::Semiannual)
     .value("quarterly" , ql::Frequency::Quarterly )
     .value("monthly"   , ql::Frequency::Monthly   )
+    .export_values()
+    ;
+
+  py::enum_<ql::Option::Type>(m, "option_type")
+    .value("put" , ql::Option::Type::Put )
+    .value("call", ql::Option::Type::Call)
     .export_values()
     ;
 
@@ -144,6 +155,60 @@ PYBIND11_MODULE(_steven, m) {
   ;
 
   py::class_<
+      ql::Quote
+    , std::shared_ptr<ql::Quote>
+  >(m, "quote")
+    ;
+
+  py::class_<
+      ql::SimpleQuote
+    , std::shared_ptr<ql::SimpleQuote>
+    , ql::Quote
+  >(m, "simplequote")
+  .def(py::init<double>()
+    , py::arg("value")
+    )
+    ;
+
+  py::class_<
+      ql::Exercise
+    , std::shared_ptr<ql::Exercise>
+  >(m, "exercice")
+    ;
+
+  py::class_<
+      ql::AmericanExercise
+    , std::shared_ptr<ql::AmericanExercise>
+    , ql::Exercise
+  >(m, "americanexercice")
+  .def(py::init<const ql::Date&, const ql::Date&>())
+    ;
+
+  py::class_<
+      ql::StrikedTypePayoff
+    , std::shared_ptr<ql::StrikedTypePayoff>
+  >(m, "striketypepayoff")
+    ;
+
+  py::class_<
+      ql::PlainVanillaPayoff
+    , std::shared_ptr<ql::PlainVanillaPayoff>
+    , ql::StrikedTypePayoff
+  >(m, "plainvanillapayoff")
+  .def(py::init<ql::Option::Type, double>()
+    , py::arg("type")
+    , py::arg("strike")
+    )
+    ;
+
+  py::class_<ql::VanillaOption>(m, "vanillaoption")
+  .def(py::init<std::shared_ptr<ql::StrikedTypePayoff>, std::shared_ptr<ql::Exercise>>()
+    , py::arg("payoff")
+    , py::arg("exercice")
+    )
+    ;
+
+  py::class_<
       ql::YieldTermStructure
     , std::shared_ptr<ql::YieldTermStructure>
   >(m, "yieldtermstructure")
@@ -169,7 +234,28 @@ PYBIND11_MODULE(_steven, m) {
     , std::shared_ptr<ql::FlatForward>
     , ql::YieldTermStructure
   >(m, "flatforward")
-    .def(py::init<ql::Date, ql::Rate, ql::DayCounter, ql::Compounding>())
+    .def(py::init<const ql::Date&, ql::Rate, const ql::DayCounter&, ql::Compounding>())
+    ;
+
+  py::class_<
+      ql::BlackVolTermStructure
+    , std::shared_ptr<ql::BlackVolTermStructure>
+  >(m, "blackvoltermstructure")
+    .def("blackvol", [](const std::shared_ptr<ql::BlackVolTermStructure>& ts, const ql::Date& dt, double strike, bool extrapolate) {
+        return ts->blackVol(dt, strike, extrapolate);
+      }
+      , py::arg("date")
+      , py::arg("strike")
+      , py::arg("extrapolate") = false
+    )
+    ;
+
+  py::class_<
+      ql::BlackConstantVol
+    , std::shared_ptr<ql::BlackConstantVol>
+    , ql::BlackVolTermStructure
+  >(m, "blackconstantvol")
+    .def(py::init<const ql::Date&, const ql::Calendar&, const ql::Handle<ql::Quote>&, const ql::DayCounter&>())
     ;
 
   // handles submodule
@@ -179,6 +265,11 @@ PYBIND11_MODULE(_steven, m) {
     py::class_<ql::Handle<ql::YieldTermStructure>>(sub, "yieldtermstructure")
       .def(py::init<std::shared_ptr<ql::YieldTermStructure>>())
       .def("link", &ql::Handle<ql::YieldTermStructure>::currentLink)
+      ;
+
+    py::class_<ql::Handle<ql::Quote>>(sub, "quote")
+      .def(py::init<std::shared_ptr<ql::Quote>>())
+      .def("link", &ql::Handle<ql::Quote>::currentLink)
       ;
   }
 }

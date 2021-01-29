@@ -1,4 +1,4 @@
 
-from ._steven._handles import yieldtermstructure, quote
+from ._steven._handles import *
 
-__all__ = [ 'yieldtermstructure' ]
+__all__ = [ 'yieldtermstructure', 'quote' ]

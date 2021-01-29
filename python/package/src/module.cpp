@@ -17,6 +17,9 @@
 #include <ql/time/daycounters/actual365fixed.hpp>
 #include <ql/termstructures/yield/flatforward.hpp>
 #include <ql/termstructures/volatility/equityfx/blackconstantvol.hpp>
+#include <ql/pricingengines/vanilla/binomialengine.hpp>
+#include <ql/processes/blackscholesprocess.hpp>
+#include <ql/processes/eulerdiscretization.hpp>
 
 namespace ql = QuantLib;
 
@@ -155,6 +158,12 @@ PYBIND11_MODULE(_steven, m) {
   ;
 
   py::class_<
+      ql::PricingEngine
+    , std::shared_ptr<ql::PricingEngine>
+  >(m, "engine")
+    ;
+
+  py::class_<
       ql::Quote
     , std::shared_ptr<ql::Quote>
   >(m, "quote")
@@ -173,14 +182,14 @@ PYBIND11_MODULE(_steven, m) {
   py::class_<
       ql::Exercise
     , std::shared_ptr<ql::Exercise>
-  >(m, "exercice")
+  >(m, "exercise")
     ;
 
   py::class_<
       ql::AmericanExercise
     , std::shared_ptr<ql::AmericanExercise>
     , ql::Exercise
-  >(m, "americanexercice")
+  >(m, "americanexercise")
   .def(py::init<const ql::Date&, const ql::Date&>())
     ;
 
@@ -258,18 +267,80 @@ PYBIND11_MODULE(_steven, m) {
     .def(py::init<const ql::Date&, const ql::Calendar&, const ql::Handle<ql::Quote>&, const ql::DayCounter&>())
     ;
 
+  py::class_<
+      ql::StochasticProcess1D::discretization
+    , std::shared_ptr<ql::StochasticProcess1D::discretization>
+  >(m, "discretization1d")
+    ;
+
+  py::class_<
+      ql::EulerDiscretization
+    , std::shared_ptr<ql::EulerDiscretization>
+    , ql::StochasticProcess1D::discretization
+  >(m, "eulerdiscretization")
+    .def(py::init<>())
+    ;
+
+  py::class_<
+      ql::GeneralizedBlackScholesProcess
+    , std::shared_ptr<ql::GeneralizedBlackScholesProcess>
+  >(m, "generalizedblackscholesprocess")
+    ;
+
+  py::class_<
+      ql::BlackScholesMertonProcess
+    , std::shared_ptr<ql::BlackScholesMertonProcess>
+    , ql::GeneralizedBlackScholesProcess
+  >(m, "blackscholesmertonprocess")
+    .def(py::init<
+          const ql::Handle<ql::Quote>&
+        , const ql::Handle<ql::YieldTermStructure>&
+        , const ql::Handle<ql::YieldTermStructure>&
+        , const ql::Handle<ql::BlackVolTermStructure>&
+        , const std::shared_ptr<ql::StochasticProcess1D::discretization>&
+        , bool
+      >()
+    , py::arg("udprice")
+    , py::arg("dividendcurve")
+    , py::arg("ratecurve")
+    , py::arg("volatilitysurface")
+    , py::arg("scheme") = std::shared_ptr<ql::StochasticProcess1D::discretization>(new ql::EulerDiscretization)
+    , py::arg("force_discretization") = false
+    )
+    ;
+
   // handles submodule
   {
     auto sub = m.def_submodule("_handles");
+
+    py::class_<ql::Handle<ql::Quote>>(sub, "quote")
+      .def(py::init<std::shared_ptr<ql::Quote>>())
+      .def("link", &ql::Handle<ql::Quote>::currentLink)
+      ;
 
     py::class_<ql::Handle<ql::YieldTermStructure>>(sub, "yieldtermstructure")
       .def(py::init<std::shared_ptr<ql::YieldTermStructure>>())
       .def("link", &ql::Handle<ql::YieldTermStructure>::currentLink)
       ;
 
-    py::class_<ql::Handle<ql::Quote>>(sub, "quote")
-      .def(py::init<std::shared_ptr<ql::Quote>>())
-      .def("link", &ql::Handle<ql::Quote>::currentLink)
+    py::class_<ql::Handle<ql::BlackVolTermStructure>>(sub, "blackvoltermstructure")
+      .def(py::init<std::shared_ptr<ql::BlackVolTermStructure>>())
+      .def("link", &ql::Handle<ql::BlackVolTermStructure>::currentLink)
+      ;
+  }
+
+  // engines submodule
+  {
+    auto sub = m.def_submodule("_engines");
+
+    py::class_<
+        ql::BinomialVanillaEngine<ql::CoxRossRubinstein>
+      , std::shared_ptr<ql::BinomialVanillaEngine<ql::CoxRossRubinstein>>
+      , ql::PricingEngine
+    >(sub, "coxrossrubinstein")
+      .def(py::init<std::shared_ptr<ql::GeneralizedBlackScholesProcess>, ql::Size>()
+      , py::arg("process")
+      , py::arg("step"))
       ;
   }
 }

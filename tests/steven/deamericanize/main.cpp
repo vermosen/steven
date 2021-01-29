@@ -85,13 +85,11 @@ TEST(unittest, option_pricing) {
     ql::ext::shared_ptr<ql::YieldTermStructure>(new ql::FlatForward(rt_settle, rf, dc, comp)));
 
   // dividend ts
-  auto div_rt = ql::Rate();
-  auto div_settle = calendar.advance(pricing_date, 1, ql::Days);     // settlement (11/01)
   auto div_dc = ql::Actual360();
   auto div_comp = ql::Compounding::Continuous;
 
   auto div_ts = ql::Handle<ql::YieldTermStructure>(
-    ql::ext::shared_ptr<ql::YieldTermStructure>(new ql::FlatForward(div_settle, div_rt, div_dc, div_comp)));
+    ql::ext::shared_ptr<ql::YieldTermStructure>(new ql::FlatForward(pricing_date, 0.0, div_dc, div_comp)));
 
   // implied vol ts
   auto vol_settle = calendar.advance(pricing_date, 1, ql::Days);
@@ -114,13 +112,15 @@ TEST(unittest, option_pricing) {
   // BSM process
   auto bsm = ql::ext::shared_ptr<ql::BlackScholesMertonProcess>(new ql::BlackScholesMertonProcess(ud_hdl, div_ts, rt_ts, vol_ts));
 
-  //ql::Size steps = static_cast<int>(std::max(700 * timeToMaturity_, 20.0));
+  auto time = vol_dc.yearFraction(pricing_date, expiry);
+  ql::Size steps = static_cast<int>(std::max(700 * time, 20.0));
 
   // pricing engine
-	//opt.setPricingEngine(
-	//	ql::ext::shared_ptr<ql::PricingEngine>(
-	//		new ql::BinomialVanillaEngine<ql::CoxRossRubinstein>(bsm, steps)));
+	opt.setPricingEngine(
+		ql::ext::shared_ptr<ql::PricingEngine>(
+	  	new ql::BinomialVanillaEngine<ql::CoxRossRubinstein>(bsm, steps)));
 
+  // auto d = opt.delta();
 }
 
 int main(int argc, char* argv[]) {

@@ -1,1 +1,1 @@
-### steven - a C++ framework to study Heston Processes
+### steven - a python package using quantlib to study Heston Processes

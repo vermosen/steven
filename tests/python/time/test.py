@@ -11,26 +11,21 @@ class test_time(unittest.TestCase):
 
   def test_set_date(self):
 
-    from steven import date, set_evaluation_date
+    from steven import date, settings
     
-    try:
-      d = date(2021, 1, 20)
-      set_evaluation_date(d)
-      throw = False
-    except:
-      throw = True
-
-    self.assertFalse(throw)
+    d = date(2021, 1, 20)
+    settings().value_date = d
+    self.assertTrue(True)
 
   def test_get_date(self):
 
-    from steven import date, set_evaluation_date, get_evaluation_date
+    from steven import date, settings
     
     result = None
     try:
       d = date(2021, 1, 20)
-      set_evaluation_date(d)
-      result = get_evaluation_date()
+      settings().value_date = d
+      result = settings().value_date
       throw = False
     except:
       throw = True

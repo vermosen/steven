@@ -13,11 +13,21 @@ from ._steven import blackvoltermstructure, blackconstantvol
 from ._steven import yieldtermstructure, flatforward
 from ._steven import vanillaoption
 
+class settings(object):
+
+  @property
+  def value_date(self):
+    return get_evaluation_date()
+
+  @value_date.setter
+  def value_date(self, date):
+    set_evaluation_date(date)
+
+
 __all__ = [ 
-      'set_evaluation_date', 'get_evaluation_date'
-    , 'date', 'timeunit', 'businessdayconvention'
-    , 'compounding', 'frequency'
-    , 'option_type', 'vanillaoption'
-    , 'blackvoltermstructure', 'blackconstantvol'
-    , 'yieldtermstructure', 'flatforward'
+    'date', 'timeunit', 'businessdayconvention'
+  , 'compounding', 'frequency', 'option_type'
+  , 'vanillaoption', 'blackvoltermstructure'
+  , 'blackconstantvol', 'yieldtermstructure'
+  , 'flatforward', 'settings'
 ]

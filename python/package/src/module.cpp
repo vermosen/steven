@@ -317,12 +317,12 @@ PYBIND11_MODULE(_steven, m) {
         , const std::shared_ptr<ql::StochasticProcess1D::discretization>&
         , bool
       >()
-    , py::arg("udprice")
-    , py::arg("dividendcurve")
-    , py::arg("ratecurve")
-    , py::arg("volatilitysurface")
-    , py::arg("scheme") = std::shared_ptr<ql::StochasticProcess1D::discretization>(new ql::EulerDiscretization)
-    , py::arg("force_discretization") = false
+      , py::arg("udprice")
+      , py::arg("dividendcurve")
+      , py::arg("ratecurve")
+      , py::arg("volatilitysurface")
+      , py::arg("scheme") = std::shared_ptr<ql::StochasticProcess1D::discretization>(new ql::EulerDiscretization)
+      , py::arg("force_discretization") = false
     )
     ;
 

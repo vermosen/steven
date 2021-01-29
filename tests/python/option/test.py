@@ -63,7 +63,7 @@ class test_option(unittest.TestCase):
   def set_coxrossrubinstein_pricingengine(self):
 
     from steven import businessdayconvention as bdc
-    from steven import date, timeunit, compounding, set_evaluation_date
+    from steven import date, timeunit, compounding, settings
     from steven import vanillaoption, option_type
     from steven import blackconstantvol, flatforward
     from steven.exercises import americanexercise
@@ -77,7 +77,7 @@ class test_option(unittest.TestCase):
     
     today = date(2021, 1, 8)
     cdr = unitedstates()
-    set_evaluation_date(today)
+    settings().value_date = today
 
     # underlying quote
     ud = handles.quote(simplequote(100.0))

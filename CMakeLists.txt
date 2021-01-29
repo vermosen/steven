@@ -70,7 +70,7 @@ load_packages(
 	UPDATE
 )
 
-create_debug_conf(NAME ${PACKAGES})
+#create_debug_conf(NAME ${PACKAGES})
 
 message(DEBUG "CONAN_LIBS set to ${CONAN_LIBS}")
 

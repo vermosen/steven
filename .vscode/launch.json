@@ -45,6 +45,31 @@
                     "ignoreFailures": true
                 }
             ]
+        }
+        {
+            "name": "(gdb) test-py-crr",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/opt/miniconda/envs/py38/bin/python",
+            "args": [ 
+                  "-m"
+                , "unittest" 
+                , "-v" 
+                , "test.test_option.set_coxrossrubinstein_pricingengine"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/tests/python/option",
+            "environment": [ {"name": "PYTHONPATH", "value": "${workspaceFolder}/lib/Debug/python"}],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/opt/gcc84/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         },
     ]
 }

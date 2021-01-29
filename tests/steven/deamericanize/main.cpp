@@ -70,7 +70,7 @@ TEST(unittest, option_pricing) {
   // option settings
   auto expiry = ql::Date(29, ql::Jan, 2021);
   auto type = ql::Option::Call;
-  auto strike = 50;
+  auto strike = 90.0;
   auto ex = ql::ext::shared_ptr<ql::Exercise>(new ql::AmericanExercise(pricing_date, expiry));
   auto payoff = ql::ext::shared_ptr<ql::StrikedTypePayoff>(new ql::PlainVanillaPayoff(type, strike));
   auto opt = ql::VanillaOption(payoff, ex);
@@ -79,7 +79,7 @@ TEST(unittest, option_pricing) {
   auto rt_settle = calendar.advance(pricing_date, 1, ql::Days);     // settlement (11/01)
   auto dc   = ql::Actual360();
   auto comp = ql::Compounding::Simple;
-  auto rf   = ql::Rate(0.001264);                                       // 1M rate from http://www.markit.com/news/InterestRates_USD_20210108.zip
+  auto rf   = ql::Rate(0.0015);                                       // 1M rate from http://www.markit.com/news/InterestRates_USD_20210108.zip
 
   auto rt_ts = ql::Handle<ql::YieldTermStructure>(
     ql::ext::shared_ptr<ql::YieldTermStructure>(new ql::FlatForward(rt_settle, rf, dc, comp)));
@@ -93,7 +93,7 @@ TEST(unittest, option_pricing) {
 
   // implied vol ts
   auto vol_settle = calendar.advance(pricing_date, 1, ql::Days);
-  double vol = 1e-5;
+  double vol = 5.0;
   ql::DayCounter vol_dc = ql::Actual365Fixed();
 
   auto vol_qt = ql::ext::shared_ptr<ql::SimpleQuote>(new ql::SimpleQuote(vol)); // can be updated
@@ -106,21 +106,17 @@ TEST(unittest, option_pricing) {
   ql::Settings::instance().evaluationDate() = pricing_date;
 
   auto ud_quote = std::shared_ptr<ql::Quote>(new ql::SimpleQuote(100.0));
-
   auto ud_hdl = ql::Handle<ql::Quote>(ud_quote);
   
   // BSM process
-  auto bsm = ql::ext::shared_ptr<ql::BlackScholesMertonProcess>(new ql::BlackScholesMertonProcess(ud_hdl, div_ts, rt_ts, vol_ts));
-
-  auto time = vol_dc.yearFraction(pricing_date, expiry);
-  ql::Size steps = static_cast<int>(std::max(700 * time, 20.0));
+  auto bsm = std::shared_ptr<ql::BlackScholesMertonProcess>(new ql::BlackScholesMertonProcess(ud_hdl, div_ts, rt_ts, vol_ts));
 
   // pricing engine
 	opt.setPricingEngine(
 		ql::ext::shared_ptr<ql::PricingEngine>(
-	  	new ql::BinomialVanillaEngine<ql::CoxRossRubinstein>(bsm, steps)));
+	  	new ql::BinomialVanillaEngine<ql::CoxRossRubinstein>(bsm, 1000)));
 
-  // auto d = opt.delta();
+  ASSERT_NEAR(opt.delta(), 0.743204, tol);
 }
 
 int main(int argc, char* argv[]) {

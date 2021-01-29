@@ -210,10 +210,27 @@ PYBIND11_MODULE(_steven, m) {
     )
     ;
 
-  py::class_<ql::VanillaOption>(m, "vanillaoption")
-  .def(py::init<std::shared_ptr<ql::StrikedTypePayoff>, std::shared_ptr<ql::Exercise>>()
-    , py::arg("payoff")
-    , py::arg("exercice")
+  py::class_<
+      ql::Instrument
+    , std::shared_ptr<ql::Instrument>
+  >(m, "instrument")
+    .def("setpricingengine"
+      , &ql::Instrument::setPricingEngine
+      , py::arg("engine")
+    )
+    ;
+
+  py::class_<ql::VanillaOption, std::shared_ptr<ql::VanillaOption>, ql::Instrument>(m, "vanillaoption")
+    .def(py::init<
+          std::shared_ptr<ql::StrikedTypePayoff>
+        , std::shared_ptr<ql::Exercise>
+      >()
+      , py::arg("payoff")
+      , py::arg("exercice")
+    )
+    .def_property_readonly("delta", [](const std::shared_ptr<ql::VanillaOption>& opt) {
+        return opt->delta(); 
+      }
     )
     ;
 

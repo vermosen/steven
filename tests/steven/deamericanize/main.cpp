@@ -76,7 +76,7 @@ TEST(unittest, option_pricing) {
   auto opt = ql::VanillaOption(payoff, ex);
 
   // risk free ts
-  auto rt_settle = calendar.advance(pricing_date, 1, ql::Days);     // settlement (11/01)
+  auto rt_settle = calendar.advance(pricing_date, 2, ql::Days);     // settlement (11/01)
   auto dc   = ql::Actual360();
   auto comp = ql::Compounding::Simple;
   auto rf   = ql::Rate(0.0015);                                       // 1M rate from http://www.markit.com/news/InterestRates_USD_20210108.zip
@@ -89,7 +89,7 @@ TEST(unittest, option_pricing) {
   auto div_comp = ql::Compounding::Continuous;
 
   auto div_ts = ql::Handle<ql::YieldTermStructure>(
-    ql::ext::shared_ptr<ql::YieldTermStructure>(new ql::FlatForward(pricing_date, 0.0, div_dc, div_comp)));
+    ql::ext::shared_ptr<ql::YieldTermStructure>(new ql::FlatForward(rt_settle, 0.0, div_dc, div_comp)));
 
   // implied vol ts
   auto vol_settle = calendar.advance(pricing_date, 1, ql::Days);
@@ -102,10 +102,7 @@ TEST(unittest, option_pricing) {
   ql::Handle<ql::BlackVolTermStructure> vol_ts(
     ql::ext::shared_ptr<ql::BlackVolTermStructure>(new ql::BlackConstantVol(vol_settle, calendar, vol_hdl, vol_dc)));
 
-  // setup
-  ql::Settings::instance().evaluationDate() = pricing_date;
-
-  auto ud_quote = std::shared_ptr<ql::Quote>(new ql::SimpleQuote(100.0));
+  auto ud_quote = std::shared_ptr<ql::Quote>(new ql::SimpleQuote(128.665));
   auto ud_hdl = ql::Handle<ql::Quote>(ud_quote);
   
   // BSM process
@@ -116,7 +113,10 @@ TEST(unittest, option_pricing) {
 		ql::ext::shared_ptr<ql::PricingEngine>(
 	  	new ql::BinomialVanillaEngine<ql::CoxRossRubinstein>(bsm, 1000)));
 
-  ASSERT_NEAR(opt.delta(), 0.743204, tol);
+  // setup
+  ql::Settings::instance().evaluationDate() = pricing_date;
+
+  ASSERT_NEAR(opt.delta(), 0.8084319065304163, tol);
 }
 
 int main(int argc, char* argv[]) {

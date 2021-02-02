@@ -1,11 +1,13 @@
 
 #include <ctime>
 #include <iomanip>
+#include <limits>
 
 #include <pybind11/pybind11.h>
 #include <pybind11/chrono.h>
 #include <pybind11/stl.h>
 
+#include <ql/handle.hpp>
 #include <ql/settings.hpp>
 #include <ql/exercise.hpp>
 #include <ql/compounding.hpp>
@@ -20,6 +22,8 @@
 #include <ql/pricingengines/vanilla/binomialengine.hpp>
 #include <ql/processes/blackscholesprocess.hpp>
 #include <ql/processes/eulerdiscretization.hpp>
+
+#include "rootfinder.h"
 
 namespace ql = QuantLib;
 
@@ -98,6 +102,16 @@ PYBIND11_MODULE(_steven, m) {
 
         return ss.str();
     })
+/*     .def("__repr__", [](const ql::Date& dt) {
+      std::stringstream ss; ss
+        << std::setfill('0') 
+        << std::setw(4) << dt.year()  << "-"  
+        << std::setw(2) << static_cast<int>(dt.month()) << "-" 
+        << std::setw(2) << dt.dayOfMonth()
+        ;
+
+        return ss.str();
+    }) */
     ;
 
   py::class_<ql::DayCounter>(m, "daycounter")
@@ -177,6 +191,7 @@ PYBIND11_MODULE(_steven, m) {
   .def(py::init<double>()
     , py::arg("value")
     )
+  .def_property("value", &ql::SimpleQuote::value, &ql::SimpleQuote::setValue)
     ;
 
   py::class_<
@@ -191,6 +206,14 @@ PYBIND11_MODULE(_steven, m) {
     , ql::Exercise
   >(m, "americanexercise")
   .def(py::init<const ql::Date&, const ql::Date&>())
+    ;
+
+  py::class_<
+      ql::EuropeanExercise
+    , std::shared_ptr<ql::EuropeanExercise>
+    , ql::Exercise
+  >(m, "europeanexercise")
+  .def(py::init<const ql::Date& /* expiry */>())
     ;
 
   py::class_<
@@ -218,6 +241,9 @@ PYBIND11_MODULE(_steven, m) {
       , &ql::Instrument::setPricingEngine
       , py::arg("engine")
     )
+    .def("npv", &ql::Instrument::NPV)
+    .def("valuedate", &ql::Instrument::valuationDate)
+    .def("error", &ql::Instrument::errorEstimate)
     ;
 
   py::class_<ql::VanillaOption, std::shared_ptr<ql::VanillaOption>, ql::Instrument>(m, "vanillaoption")
@@ -229,7 +255,7 @@ PYBIND11_MODULE(_steven, m) {
       , py::arg("exercice")
     )
     .def_property_readonly("delta", [](const std::shared_ptr<ql::VanillaOption>& opt) {
-        return opt->delta(); 
+        return opt->delta();
       }
     )
     ;
@@ -330,9 +356,27 @@ PYBIND11_MODULE(_steven, m) {
   {
     auto sub = m.def_submodule("_handles");
 
-    py::class_<ql::Handle<ql::Quote>>(sub, "quote")
+    py::class_<ql::Handle<ql::Quote>>(sub, "_quote")
       .def(py::init<std::shared_ptr<ql::Quote>>())
       .def("link", &ql::Handle<ql::Quote>::currentLink)
+      .def("__str__", [](const ql::Handle<ql::Quote>& q) {
+          std::stringstream ss; ss 
+            << q->value()
+            ;
+          
+          return ss.str();
+        }
+      )
+      ;
+
+    py::class_<ql::RelinkableHandle<ql::Quote>, ql::Handle<ql::Quote>>(sub, "quote")
+      .def(py::init<std::shared_ptr<ql::Quote>>())
+      .def("linkto", [](ql::RelinkableHandle<ql::Quote>& hdl, const std::shared_ptr<ql::Quote>& qt, bool reg) {
+          hdl.linkTo(qt, reg);
+        }
+        , py::arg("quote")
+        , py::arg("register") = true
+      )
       ;
 
     py::class_<ql::Handle<ql::YieldTermStructure>>(sub, "yieldtermstructure")
@@ -358,6 +402,26 @@ PYBIND11_MODULE(_steven, m) {
       .def(py::init<std::shared_ptr<ql::GeneralizedBlackScholesProcess>, ql::Size>()
       , py::arg("process")
       , py::arg("step"))
+      ;
+  }
+
+  // solver module
+  {
+    auto sub = m.def_submodule("_solvers");
+
+    py::class_<rootfinder>(sub, "rootfinder")
+      .def(py::init<const std::shared_ptr<ql::Instrument>&, const std::shared_ptr<ql::SimpleQuote>&>()
+        , py::arg("instrument")
+        , py::arg("quote")
+      )
+      .def("solve"
+        , &rootfinder::solve
+        , py::arg("guess")
+        , py::arg("npv")
+        , py::arg("accuracy") = 1e-12
+        , py::arg("xmax") = 1e2
+        , py::arg("xmin") = -1.0
+      )
       ;
   }
 }

@@ -1,4 +1,4 @@
 
-from ._steven import americanexercise
+from ._steven import americanexercise, europeanexercise
 
-__all__ = [ 'americanexercise' ]
+__all__ = [ 'americanexercise', 'europeanexercise' ]

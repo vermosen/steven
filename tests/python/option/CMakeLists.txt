@@ -26,3 +26,12 @@ add_py_unittest(
 	PYTHONPATH ${PYTHONPATH_TESTSUITE}
 	DEPENDS steven.python.package.import
 )
+
+add_py_unittest(
+	EXEC ${PYTHON_EXECUTABLE} 
+	NAME find_implied_vol
+	CLASS test_option 
+	FILE test
+	PYTHONPATH ${PYTHONPATH_TESTSUITE}
+	DEPENDS steven.python.package.import
+)

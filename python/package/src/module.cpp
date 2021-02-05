@@ -419,8 +419,8 @@ PYBIND11_MODULE(_steven, m) {
         , py::arg("guess")
         , py::arg("npv")
         , py::arg("accuracy") = 1e-12
-        , py::arg("xmax") = 1e2
-        , py::arg("xmin") = -1.0
+        , py::arg("xmax")     = 1e2
+        , py::arg("xmin")     = -1.0
       )
       ;
   }

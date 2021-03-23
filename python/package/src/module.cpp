@@ -258,6 +258,18 @@ PYBIND11_MODULE(_steven, m) {
         return opt->delta();
       }
     )
+    .def_property_readonly("strike", [](const std::shared_ptr<ql::VanillaOption>& opt) {
+        
+        auto p = std::dynamic_pointer_cast<ql::StrikedTypePayoff>(opt->payoff());
+        
+        if (p) {
+          return p->strike();
+        } else {
+          throw std::logic_error("wrong payoff type passed");
+        }
+        
+      }
+    )
     ;
 
   py::class_<

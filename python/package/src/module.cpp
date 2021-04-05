@@ -77,11 +77,15 @@ PYBIND11_MODULE(_steven, m) {
     ;
 
   py::class_<ql::Date>(m, "date")
-    .def(py::init<>())
+    /* .def(py::init<>()) */
     .def(py::init<>([](int year, int month, int day) {
-        return ql::Date(day, static_cast<ql::Month>(month), year);
-      }
-    ))
+          return ql::Date(day, static_cast<ql::Month>(month), year);
+        }
+      )
+      , py::arg("year")  = 1970
+      , py::arg("month") = 1
+      , py::arg("day")   = 1
+    )
     .def_property_readonly("year" , &ql::Date::year)
     .def_property_readonly("day"  , &ql::Date::dayOfMonth)
     .def_property_readonly("month", [](const ql::Date& dt) {
@@ -93,33 +97,38 @@ PYBIND11_MODULE(_steven, m) {
       }
     )
     .def("__str__", [](const ql::Date& dt) {
-      std::stringstream ss; ss
-        << std::setfill('0') 
-        << std::setw(4) << dt.year()  << "-"  
-        << std::setw(2) << static_cast<int>(dt.month()) << "-" 
-        << std::setw(2) << dt.dayOfMonth()
-        ;
+        std::stringstream ss; ss
+          << std::setfill('0') 
+          << std::setw(4) << dt.year()  << "-"  
+          << std::setw(2) << static_cast<int>(dt.month()) << "-" 
+          << std::setw(2) << dt.dayOfMonth()
+          ;
 
         return ss.str();
-    })
-/*     .def("__repr__", [](const ql::Date& dt) {
-      std::stringstream ss; ss
-        << std::setfill('0') 
-        << std::setw(4) << dt.year()  << "-"  
-        << std::setw(2) << static_cast<int>(dt.month()) << "-" 
-        << std::setw(2) << dt.dayOfMonth()
-        ;
+      }
+    )
+    .def("__repr__", [](const ql::Date& dt) {
+        std::stringstream ss; ss
+          << std::setfill('0') 
+          << std::setw(4) << dt.year()  << "-"  
+          << std::setw(2) << static_cast<int>(dt.month()) << "-" 
+          << std::setw(2) << dt.dayOfMonth()
+          ;
 
         return ss.str();
-    }) */
+      }
+    )
     ;
 
   py::class_<ql::DayCounter>(m, "daycounter")
-    .def("yearfraction", &ql::DayCounter::yearFraction
+    .def("yearfraction", [](
+        ql::DayCounter& dc, const ql::Date& start, const ql::Date& end) {
+          return dc.yearFraction(start, end, ql::Date(), ql::Date());
+        }
       , py::arg("start")
       , py::arg("end")
-      , py::arg("refstart") = ql::Date()
-      , py::arg("refend") = ql::Date()
+    /*, py::arg("refstart") = ql::Date() // warning ! when registering, create bugs with date __repr__ method
+      , py::arg("refend") = ql::Date() */
     )
     ;
 
@@ -379,6 +388,14 @@ PYBIND11_MODULE(_steven, m) {
           return ss.str();
         }
       )
+      .def("__repr__", [](const ql::Handle<ql::Quote>& q) {
+          std::stringstream ss; ss
+            << q->value()
+            ;
+
+          return ss.str();
+        }
+      )
       ;
 
     py::class_<ql::RelinkableHandle<ql::Quote>, ql::Handle<ql::Quote>>(sub, "quote")
@@ -426,13 +443,27 @@ PYBIND11_MODULE(_steven, m) {
         , py::arg("instrument")
         , py::arg("quote")
       )
-      .def("solve"
-        , &rootfinder::solve
+      .def("solve", [](rootfinder& rf
+            , double guess, double npv
+            , double acc, double xmax
+            , double xmin, bool verbose) {
+
+          try {
+            return rf.solve(guess, npv, acc, xmax, xmin);
+          } catch(const std::exception& ex) {
+              
+            if (verbose) {
+              py::print(ex.what());
+            }
+            throw ex;
+          }
+        }
         , py::arg("guess")
         , py::arg("npv")
         , py::arg("accuracy") = 1e-12
-        , py::arg("xmax")     = 1e2
-        , py::arg("xmin")     = -1.0
+        , py::arg("xmax")     = 10
+        , py::arg("xmin")     = 1e-2
+        , py::arg("verbose")  = false
       )
       ;
   }

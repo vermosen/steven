@@ -26,8 +26,8 @@ double rootfinder::solve(
 
     auto cost = [&](double x) {
       m_qt->setValue(x);
-      //m_in->update();
-      return tgt - m_in->NPV();
+      auto value = m_in->NPV();
+      return tgt - value;
     };
 
     result = solver.solve(cost, acc, m_qt->value(), xmin, xmax); 

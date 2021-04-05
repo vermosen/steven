@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) script pricing-crr",
+            "name": "(gdb) script surface",
             "type": "cppdbg",
             "request": "launch",
             "program": "/opt/miniconda/envs/py38/bin/python",
             "args": [ 
-                "${workspaceFolder}/python/scripts/pricing-crr.py"
+                "${workspaceFolder}/python/scripts/surface.py"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

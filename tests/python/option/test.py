@@ -27,7 +27,8 @@ class test_option(unittest.TestCase):
     from steven import businessdayconvention as bdc
     from steven import date, timeunit, compounding
     from steven import vanillaoption, option_type
-    from steven import blackconstantvol, flatforward
+    from steven import blackconstantvol
+    from steven.yieldcurve import flatforward
     from steven.exercises import americanexercise
     from steven.payoffs import plainvanillapayoff
     from steven.calendars import unitedstates
@@ -65,7 +66,8 @@ class test_option(unittest.TestCase):
     from steven import businessdayconvention as bdc
     from steven import date, timeunit, compounding, settings
     from steven import vanillaoption, option_type
-    from steven import blackconstantvol, flatforward
+    from steven import blackconstantvol
+    from steven.yieldcurve import flatforward
     from steven.exercises import americanexercise
     from steven.payoffs import plainvanillapayoff
     from steven.calendars import unitedstates
@@ -115,7 +117,8 @@ class test_option(unittest.TestCase):
     from steven import businessdayconvention as bdc
     from steven import date, timeunit, compounding, settings
     from steven import vanillaoption, option_type
-    from steven import blackconstantvol, flatforward
+    from steven import blackconstantvol
+    from steven.yieldcurve import flatforward
     from steven.exercises import americanexercise
     from steven.payoffs import plainvanillapayoff
     from steven.calendars import unitedstates
@@ -170,7 +173,8 @@ class test_option(unittest.TestCase):
     from steven import businessdayconvention as bdc
     from steven import date, timeunit, compounding, settings
     from steven import vanillaoption, option_type
-    from steven import blackconstantvol, flatforward
+    from steven import blackconstantvol
+    from steven.yieldcurve import flatforward
     from steven.exercises import americanexercise
     from steven.payoffs import plainvanillapayoff
     from steven.calendars import unitedstates

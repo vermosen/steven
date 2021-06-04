@@ -17,6 +17,7 @@ pybind11_add_module(${TARGET_NAME} MODULE
 
 target_link_libraries(${TARGET_NAME} 
 	PUBLIC CONAN_PKG::quantlib
+	steven
 )
 
 install(

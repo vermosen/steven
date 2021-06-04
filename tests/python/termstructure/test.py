@@ -12,10 +12,10 @@ class test_termstructure(unittest.TestCase):
   def test_create_yieldtermstructure(self):
     
     from steven import handles
+    from steven import date, timeunit, compounding
     from steven.calendars import unitedstates
     from steven.daycounters import actual365
-    from steven import date, timeunit, compounding
-    from steven import flatforward, yieldtermstructure
+    from steven.yieldcurve import flatforward, yieldtermstructure
 
     dt = date(2020, 1, 4)
     cv = flatforward(dt, 0.001, actual365(), compounding.simple)

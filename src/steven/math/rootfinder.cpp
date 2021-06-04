@@ -1,10 +1,12 @@
-#include "rootfinder.h"
+#include <steven/math/rootfinder.h>
 
 #include <ql/instrument.hpp>
 #include <ql/quotes/simplequote.hpp>
 #include <ql/math/solvers1d/brent.hpp>
 
 namespace ql = QuantLib;
+
+using namespace steven;
 
 rootfinder::rootfinder(
     const std::shared_ptr<ql::Instrument>& in

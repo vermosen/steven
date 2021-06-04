@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.13)
+  
 cmake_minimum_required (VERSION 3.13)
 
 SET(TARGET_NAME steven)
@@ -6,17 +6,20 @@ SET(TARGET_NAME steven)
 setup_component(TARGET ${TARGET_NAME})
 
 file(GLOB_RECURSE TARGET_HEADERS CONFIGURE_DEPENDS "*.h")
+file(GLOB_RECURSE TARGET_SOURCES CONFIGURE_DEPENDS "*.cpp")
 
-add_library(${TARGET_NAME} INTERFACE)
-
-target_include_directories(
-    ${TARGET_NAME} 
-    INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}  
+add_library(
+    ${TARGET_NAME} STATIC 
+    ${TARGET_HEADERS}
+    ${TARGET_SOURCES}
 )
 
-target_link_libraries(${TARGET_NAME} 
-    INTERFACE 	
-    CONAN_PKG::quantlib
+target_link_libraries(${TARGET_NAME}
+	PUBLIC 
+	CONAN_PKG::quantlib
+	stdc++fs 
 )
 
-install_library(NAME ${TARGET_NAME})
+set_property(TARGET steven PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+install_library(TARGET ${TARGET_NAME})

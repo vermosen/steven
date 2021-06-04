@@ -17,13 +17,14 @@
 #include <ql/time/calendars/unitedstates.hpp>
 #include <ql/time/daycounters/actual360.hpp>
 #include <ql/time/daycounters/actual365fixed.hpp>
-#include <ql/termstructures/yield/flatforward.hpp>
 #include <ql/termstructures/volatility/equityfx/blackconstantvol.hpp>
 #include <ql/pricingengines/vanilla/binomialengine.hpp>
 #include <ql/processes/blackscholesprocess.hpp>
 #include <ql/processes/eulerdiscretization.hpp>
 
-#include "rootfinder.h"
+#include <steven/math/rootfinder.h>
+
+#include "yieldcurve.h"
 
 namespace ql = QuantLib;
 
@@ -282,35 +283,6 @@ PYBIND11_MODULE(_steven, m) {
     ;
 
   py::class_<
-      ql::YieldTermStructure
-    , std::shared_ptr<ql::YieldTermStructure>
-  >(m, "yieldtermstructure")
-    .def("zerorate", [](
-          std::shared_ptr<ql::YieldTermStructure> ts
-        , const ql::Date& dt
-        , const ql::DayCounter& dc
-        , ql::Compounding c
-        , ql::Frequency freq
-        , bool extrapolate) -> double {
-        return ts->zeroRate(dt, dc, c, freq, extrapolate).rate();
-      }
-      , py::arg("date")
-      , py::arg("daycounter")
-      , py::arg("compounding")
-      , py::arg("frequency")
-      , py::arg("extrapolate") = false
-    )
-    ;
-
-  py::class_<
-      ql::FlatForward
-    , std::shared_ptr<ql::FlatForward>
-    , ql::YieldTermStructure
-  >(m, "flatforward")
-    .def(py::init<const ql::Date&, ql::Rate, const ql::DayCounter&, ql::Compounding>())
-    ;
-
-  py::class_<
       ql::BlackVolTermStructure
     , std::shared_ptr<ql::BlackVolTermStructure>
   >(m, "blackvoltermstructure")
@@ -438,12 +410,12 @@ PYBIND11_MODULE(_steven, m) {
   {
     auto sub = m.def_submodule("_solvers");
 
-    py::class_<rootfinder>(sub, "rootfinder")
+    py::class_<steven::rootfinder>(sub, "rootfinder")
       .def(py::init<const std::shared_ptr<ql::Instrument>&, const std::shared_ptr<ql::SimpleQuote>&>()
         , py::arg("instrument")
         , py::arg("quote")
       )
-      .def("solve", [](rootfinder& rf
+      .def("solve", [](steven::rootfinder& rf
             , double guess, double npv
             , double acc, double xmax
             , double xmin, bool verbose) {
@@ -466,5 +438,7 @@ PYBIND11_MODULE(_steven, m) {
         , py::arg("verbose")  = false
       )
       ;
+
+    init_submodule_yieldcurve(m);
   }
 }

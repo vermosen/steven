@@ -67,7 +67,7 @@
                     "ignoreFailures": true
                 }
             ]
-        }
+        },
         {
             "name": "(gdb) test-py-crr",
             "type": "cppdbg",

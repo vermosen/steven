@@ -39,4 +39,6 @@ void init_submodule_yieldcurve(pybind11::module& m) {
   >(sub, "flatforward")
     .def(py::init<const ql::Date&, ql::Rate, const ql::DayCounter&, ql::Compounding>())
     ;
+
+  
 }

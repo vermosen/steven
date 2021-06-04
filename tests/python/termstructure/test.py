@@ -22,6 +22,33 @@ class test_termstructure(unittest.TestCase):
     hdl = handles.yieldtermstructure(cv)
     self.assertIsInstance(hdl.link(), yieldtermstructure)
 
+  def test_create_schedule(self):
+
+    from steven import date, timeunit
+    from steven.calendars import unitedstates
+    from steven import businessdayconvention as bdc
+    from steven import period, schedule, dategenerationrule as drule
+
+    start       = date(2021, 1, 8)
+    first       = date(2021, 7, 8)
+    end         = date(2031, 1, 8)
+    penultimate = date(2030, 7, 8)
+
+    tenor = period(6, timeunit.months)
+    cdr = unitedstates()
+
+    sdl = schedule(
+      start, end, 
+      tenor, cdr, 
+      bdc.following, 
+      bdc.following, 
+      drule.backward,
+      True,
+      first, penultimate
+    )
+
+    self.assertIsInstance(sdl, schedule)
+
   def test_create_blackconstantvoltermstruture(self):
 
     from steven import handles

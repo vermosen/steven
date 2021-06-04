@@ -11,6 +11,7 @@
 #include <ql/settings.hpp>
 #include <ql/exercise.hpp>
 #include <ql/compounding.hpp>
+#include <ql/time/schedule.hpp>
 #include <ql/quotes/simplequote.hpp>
 #include <ql/instruments/payoffs.hpp>
 #include <ql/instruments/vanillaoption.hpp>
@@ -77,6 +78,13 @@ PYBIND11_MODULE(_steven, m) {
     .export_values()
     ;
 
+  py::enum_<ql::DateGeneration::Rule>(m, "dategenerationrule")
+    .value("backward"  , ql::DateGeneration::Rule::Backward)
+    .value("forward"   , ql::DateGeneration::Rule::Forward )
+    .value("zero"      , ql::DateGeneration::Rule::Zero    )
+    .export_values()
+    ;
+
   py::class_<ql::Date>(m, "date")
     /* .def(py::init<>()) */
     .def(py::init<>([](int year, int month, int day) {
@@ -108,7 +116,7 @@ PYBIND11_MODULE(_steven, m) {
         return ss.str();
       }
     )
-    .def("__repr__", [](const ql::Date& dt) {
+/*     .def("__repr__", [](const ql::Date& dt) {
         std::stringstream ss; ss
           << std::setfill('0') 
           << std::setw(4) << dt.year()  << "-"  
@@ -118,7 +126,7 @@ PYBIND11_MODULE(_steven, m) {
 
         return ss.str();
       }
-    )
+    ) */
     ;
 
   py::class_<ql::DayCounter>(m, "daycounter")
@@ -202,6 +210,16 @@ PYBIND11_MODULE(_steven, m) {
     , py::arg("value")
     )
   .def_property("value", &ql::SimpleQuote::value, &ql::SimpleQuote::setValue)
+    ;
+
+  py::class_<
+      ql::Period
+    , std::shared_ptr<ql::Period>
+  >(m, "period")
+  .def(py::init<int, ql::TimeUnit>()
+    , py::arg("n")
+    , py::arg("unit")
+    )
     ;
 
   py::class_<
@@ -345,6 +363,49 @@ PYBIND11_MODULE(_steven, m) {
     )
     ;
 
+  py::class_<
+      ql::Schedule
+/*     , std::shared_ptr<ql::Schedule> */
+  >(m, "schedule")
+    .def(py::init<
+          const ql::Date&
+        , const ql::Date&
+        , const ql::Period&
+        , const ql::Calendar&
+        , ql::BusinessDayConvention
+        , ql::BusinessDayConvention
+        , ql::DateGeneration::Rule
+        , bool
+        , const ql::Date&
+        , const ql::Date&
+      >()
+      , py::arg("effectiveDate")
+      , py::arg("terminationDate")
+      , py::arg("tenor")
+      , py::arg("calendar")
+      , py::arg("convention")
+      , py::arg("terminationDateConvention")
+      , py::arg("rule")
+      , py::arg("eom")
+      , py::arg("firstDate") // = ql::Date() bugged
+      , py::arg("nextToLastDate") // = ql::Date() bugged
+    )
+    .def("__str__", [](const ql::Schedule& s) {
+
+          std::stringstream ss;
+
+          for (auto& it : s) {
+            ss 
+              << it << '\n'
+              ;
+          }
+          
+          return ss.str();
+      }
+    )
+    ;
+
+  
   // handles submodule
   {
     auto sub = m.def_submodule("_handles");
@@ -360,14 +421,14 @@ PYBIND11_MODULE(_steven, m) {
           return ss.str();
         }
       )
-      .def("__repr__", [](const ql::Handle<ql::Quote>& q) {
+/*       .def("__repr__", [](const ql::Handle<ql::Quote>& q) {
           std::stringstream ss; ss
             << q->value()
             ;
 
           return ss.str();
         }
-      )
+      ) */
       ;
 
     py::class_<ql::RelinkableHandle<ql::Quote>, ql::Handle<ql::Quote>>(sub, "quote")

@@ -1,7 +1,8 @@
-#include "solver.h"
+#include "math.h"
 
 #include <ql/instrument.hpp>
 #include <ql/quotes/simplequote.hpp>
+#include <ql/math/optimization/simplex.hpp>
 
 #include <steven/math/rootfinder.h>
 
@@ -9,10 +10,18 @@ namespace ql = QuantLib;
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-void init_submodule_solver(pybind11::module& m) {
+void init_submodule_math(pybind11::module& m) {
 
-  auto sub = m.def_submodule("_solvers");
+  auto sub = m.def_submodule("_math");
 
+  py::class_<ql::OptimizationMethod>(sub, "optimizationmethod")
+    ;
+
+  py::class_<ql::Simplex>(sub, "simplex")
+    .def(py::init<ql::Real>()
+    , py::arg("lambda") = 1.0)
+    ;
+  
   py::class_<steven::rootfinder>(sub, "rootfinder")
     .def(py::init<const std::shared_ptr<ql::Instrument>&, const std::shared_ptr<ql::SimpleQuote>&>()
       , py::arg("instrument")

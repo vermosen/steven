@@ -64,7 +64,7 @@ engs = [coxrossrubinstein(b, step=1000) for b in bsms]
 for o, e in dict(zip(opts, engs)).items():
   o = o.setpricingengine(e)
 
-from steven.solvers import rootfinder
+from steven.math import rootfinder
 
 data = list(zip(opts, h_vs, strike_map.values()))
 

@@ -25,9 +25,9 @@
 #include <ql/processes/blackscholesprocess.hpp>
 #include <ql/processes/eulerdiscretization.hpp>
 
-#include "yieldcurve.h"
-#include "solver.h"
+#include "math.h"
 #include "handle.h"
+#include "yieldcurve.h"
 
 namespace ql = QuantLib;
 
@@ -483,7 +483,7 @@ PYBIND11_MODULE(_steven, m) {
       ;
   }
 
-  init_submodule_solver(m);
+  init_submodule_math(m);
   init_submodule_handle(m);
   init_submodule_yieldcurve(m);
 }

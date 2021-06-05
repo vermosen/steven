@@ -127,7 +127,7 @@ class test_option(unittest.TestCase):
     from steven.processes import blackscholesmerton
     from steven.engines import coxrossrubinstein
     from steven import handles
-    from steven.solvers import rootfinder
+    from steven.math import rootfinder
     
     today = date(2021, 1, 8)
     cdr = unitedstates()
@@ -183,7 +183,7 @@ class test_option(unittest.TestCase):
     from steven.processes import blackscholesmerton
     from steven.engines import coxrossrubinstein
     from steven import handles
-    from steven.solvers import rootfinder
+    from steven.math import rootfinder
     
     today = date(2021, 1, 8)
     cdr = unitedstates()

@@ -48,6 +48,7 @@ set(GTEST_VERS     "1.8.1" )
 set(PYBIND11_VERS  "2.5.0" )
 set(DOXYGEN_VERS   "1.8.18")
 set(QUANTLIB_VERS  "1.22.0")
+set(EIGEN_VERS     "3.3.7" )
 set(META_VERS      "0.1.13")
 set(IWYU_VERS      "0.15.0")
 
@@ -56,7 +57,8 @@ set(PACKAGES
    pybind11
    doxygen
    quantlib
-   meta
+   eigen
+	 meta
 )
 
 if (LLVM_TOOLING)

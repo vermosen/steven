@@ -1,8 +1,10 @@
 #include "yieldcurve.h"
 
+#include <pybind11/eigen.h>
 #include <ql/instruments/bond.hpp>
 #include <ql/termstructures/yield/bondhelpers.hpp>
 #include <ql/termstructures/yield/flatforward.hpp>
+#include <ql/termstructures/yield/fittedbonddiscountcurve.hpp>
 
 namespace ql = QuantLib;
 namespace py = pybind11;
@@ -18,6 +20,17 @@ void init_submodule_yieldcurve(pybind11::module& m) {
     .value("dirty", ql::Bond::Price::Type::Dirty)
     .export_values()
     ;
+
+  py::class_<
+      ql::FittedBondDiscountCurve::FittingMethod
+  >(sub, "fittingmethod")
+    ;
+
+/*   py::class_<
+      ql::CubicBSplinesFitting
+    ,  
+  >(sub, "cubicbsplinefitting")
+    ; */
 
   py::class_<
       ql::YieldTermStructure
@@ -50,6 +63,7 @@ void init_submodule_yieldcurve(pybind11::module& m) {
 
   py::class_<
       ql::BondHelper
+    , std::shared_ptr<ql::BondHelper>
   >(sub, "bondhelper")
   .def(py::init<
           ql::Handle<ql::Quote>
@@ -59,5 +73,40 @@ void init_submodule_yieldcurve(pybind11::module& m) {
         , py::arg("bond")
         , py::arg("pricetype") = ql::Bond::Price::Type::Clean)
   ;
-  
+
+  py::class_<
+      ql::FittedBondDiscountCurve
+  >(sub, "fittedbonddiscountcurve")
+  .def(py::init<>([](
+          ql::Natural settlementDays
+        , const ql::Calendar& calendar
+        , std::vector<std::shared_ptr<ql::BondHelper>> bonds
+        , const ql::DayCounter& dc
+        , const ql::FittedBondDiscountCurve::FittingMethod& method
+        , ql::Real accuracy
+        , ql::Size maxit
+        , Eigen::Ref<const Eigen::VectorXd> guess
+        , ql::Real lambda
+        , ql::Size maxstat) {
+
+          // TODO: convert eigen array to ql
+          auto arr = ql::Array();
+
+          return ql::FittedBondDiscountCurve(settlementDays
+            , calendar, bonds, dc, method
+            , accuracy, maxit, arr
+            , lambda, maxstat);
+        })
+      , py::arg("settlementdays")
+      , py::arg("calendar")
+      , py::arg("bonds")
+      , py::arg("daycounter")
+      , py::arg("method")
+      , py::arg("accuracy") = 1.0e-10
+      , py::arg("maxit") = 10000
+      , py::arg("guess") = Eigen::VectorXd()
+      , py::arg("lambda") = 1.0
+      , py::arg("maxstationaryiteration") = 100
+    )
+  ;
 }

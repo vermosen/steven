@@ -18,14 +18,14 @@
 #include <ql/time/calendars/unitedstates.hpp>
 #include <ql/time/daycounters/actual360.hpp>
 #include <ql/time/daycounters/actual365fixed.hpp>
-#include <ql/termstructures/volatility/equityfx/blackconstantvol.hpp>
+
 #include <ql/pricingengines/vanilla/binomialengine.hpp>
 #include <ql/processes/blackscholesprocess.hpp>
 #include <ql/processes/eulerdiscretization.hpp>
 
-#include <steven/math/rootfinder.h>
-
 #include "yieldcurve.h"
+#include "solver.h"
+#include "handle.h"
 
 namespace ql = QuantLib;
 
@@ -405,53 +405,6 @@ PYBIND11_MODULE(_steven, m) {
     )
     ;
 
-  
-  // handles submodule
-  {
-    auto sub = m.def_submodule("_handles");
-
-    py::class_<ql::Handle<ql::Quote>>(sub, "_quote")
-      .def(py::init<std::shared_ptr<ql::Quote>>())
-      .def("link", &ql::Handle<ql::Quote>::currentLink)
-      .def("__str__", [](const ql::Handle<ql::Quote>& q) {
-          std::stringstream ss; ss 
-            << q->value()
-            ;
-          
-          return ss.str();
-        }
-      )
-/*       .def("__repr__", [](const ql::Handle<ql::Quote>& q) {
-          std::stringstream ss; ss
-            << q->value()
-            ;
-
-          return ss.str();
-        }
-      ) */
-      ;
-
-    py::class_<ql::RelinkableHandle<ql::Quote>, ql::Handle<ql::Quote>>(sub, "quote")
-      .def(py::init<std::shared_ptr<ql::Quote>>())
-      .def("linkto", [](ql::RelinkableHandle<ql::Quote>& hdl, const std::shared_ptr<ql::Quote>& qt, bool reg) {
-          hdl.linkTo(qt, reg);
-        }
-        , py::arg("quote")
-        , py::arg("register") = true
-      )
-      ;
-
-    py::class_<ql::Handle<ql::YieldTermStructure>>(sub, "yieldtermstructure")
-      .def(py::init<std::shared_ptr<ql::YieldTermStructure>>())
-      .def("link", &ql::Handle<ql::YieldTermStructure>::currentLink)
-      ;
-
-    py::class_<ql::Handle<ql::BlackVolTermStructure>>(sub, "blackvoltermstructure")
-      .def(py::init<std::shared_ptr<ql::BlackVolTermStructure>>())
-      .def("link", &ql::Handle<ql::BlackVolTermStructure>::currentLink)
-      ;
-  }
-
   // engines submodule
   {
     auto sub = m.def_submodule("_engines");
@@ -467,39 +420,7 @@ PYBIND11_MODULE(_steven, m) {
       ;
   }
 
-  // solver module
-  {
-    auto sub = m.def_submodule("_solvers");
-
-    py::class_<steven::rootfinder>(sub, "rootfinder")
-      .def(py::init<const std::shared_ptr<ql::Instrument>&, const std::shared_ptr<ql::SimpleQuote>&>()
-        , py::arg("instrument")
-        , py::arg("quote")
-      )
-      .def("solve", [](steven::rootfinder& rf
-            , double guess, double npv
-            , double acc, double xmax
-            , double xmin, bool verbose) {
-
-          try {
-            return rf.solve(guess, npv, acc, xmax, xmin);
-          } catch(const std::exception& ex) {
-              
-            if (verbose) {
-              py::print(ex.what());
-            }
-            throw ex;
-          }
-        }
-        , py::arg("guess")
-        , py::arg("npv")
-        , py::arg("accuracy") = 1e-12
-        , py::arg("xmax")     = 10
-        , py::arg("xmin")     = 1e-2
-        , py::arg("verbose")  = false
-      )
-      ;
-
-    init_submodule_yieldcurve(m);
-  }
+  init_submodule_solver(m);
+  init_submodule_handle(m);
+  init_submodule_yieldcurve(m);
 }

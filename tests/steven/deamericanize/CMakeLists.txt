@@ -18,6 +18,7 @@ target_link_libraries(${TARGET_NAME}
 	steven
 	CONAN_PKG::gtest 
 	Threads::Threads
+	QuantLib
 )
 
 add_gtest(TARGET ${TARGET_NAME})

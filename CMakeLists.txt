@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 3.13)
 
 option(STEVEN-DOCS "create the sphinx documentation of the project" ON)
+option(LLVM_TOOLING "add llvm tooling" OFF)
 
 set(PROJECT_HOME "${CMAKE_CURRENT_LIST_DIR}")
 set(PROJECT_NAME steven CACHE STRING "" FORCE)
@@ -44,14 +45,13 @@ PROJECT(
 ##############################
 
 set(GTEST_VERS     "1.8.1" )
-set(RCPP_VERS      "1.0.4" )
 set(PYBIND11_VERS  "2.5.0" )
 set(DOXYGEN_VERS   "1.8.18")
-set(QUANTLIB_VERS  "1.20.0")
-set(META_VERS      "0.1.7" )
+set(QUANTLIB_VERS  "1.22.0")
+set(META_VERS      "0.1.13")
+set(IWYU_VERS      "0.15.0")
 
 set(PACKAGES
-   rcpp
    gtest
    pybind11
    doxygen
@@ -59,14 +59,22 @@ set(PACKAGES
    meta
 )
 
+if (LLVM_TOOLING)
+	set(PACKAGES ${PACKAGES} iwyu)
+endif()
+
 message(STATUS "package list has been set to ${PACKAGES}")
+
+set(PKG_OPTIONS "quantlib:use_std_shared_ptr=True;quantlib:use_std_unique_ptr=True")
 
 # imported packages
 load_packages(
 	NAME ${PACKAGES}
-	PROFILE ${CMAKE_PROFILE}
-	SETTINGS "${CONAN_EXTRA_SETTINGS};build_type=${CMAKE_BUILD_TYPE}"
-	OPTIONS "quantlib:use_std_shared_ptr=True;quantlib:use_std_unique_ptr=True"
+	USER ${CONAN_USERNAME}
+	CHANNEL ${CONAN_CHANNEL}
+	PROFILE ${CONAN_PROFILE}
+	SETTINGS "build_type=${CMAKE_BUILD_TYPE}"
+	OPTIONS "${PKG_OPTIONS}"
 	UPDATE
 )
 
@@ -90,7 +98,6 @@ add_subdirectory(src/steven)
 #    add the project applications   #
 #####################################
 
-#add_subdirectory(R/package)
 add_subdirectory(python/package)
 
 #####################################
@@ -98,7 +105,7 @@ add_subdirectory(python/package)
 #####################################
 
 # breathe does not seem to work for now on ...
-# compare to project 
+# TODO: compare to project 
 # https://github.com/PCMSolver/pcmsolver
 if (STEVEN-DOCS)
 	add_subdirectory(docs)

@@ -1,6 +1,8 @@
 
 #include <gtest/gtest.h>
 
+#include <memory>
+
 #include <ql/handle.hpp>
 #include <ql/exercise.hpp>
 #include <ql/time/date.hpp>
@@ -71,8 +73,8 @@ TEST(unittest, option_pricing) {
   auto expiry = ql::Date(29, ql::Jan, 2021);
   auto type = ql::Option::Call;
   auto strike = 90.0;
-  auto ex = ql::ext::shared_ptr<ql::Exercise>(new ql::AmericanExercise(pricing_date, expiry));
-  auto payoff = ql::ext::shared_ptr<ql::StrikedTypePayoff>(new ql::PlainVanillaPayoff(type, strike));
+  auto ex = std::shared_ptr<ql::Exercise>(new ql::AmericanExercise(pricing_date, expiry));
+  auto payoff = std::shared_ptr<ql::StrikedTypePayoff>(new ql::PlainVanillaPayoff(type, strike));
   auto opt = ql::VanillaOption(payoff, ex);
 
   // risk free ts

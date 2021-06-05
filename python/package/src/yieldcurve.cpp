@@ -5,6 +5,7 @@
 #include <ql/termstructures/yield/bondhelpers.hpp>
 #include <ql/termstructures/yield/flatforward.hpp>
 #include <ql/termstructures/yield/fittedbonddiscountcurve.hpp>
+#include <ql/termstructures/yield/nonlinearfittingmethods.hpp>
 
 namespace ql = QuantLib;
 namespace py = pybind11;
@@ -26,11 +27,39 @@ void init_submodule_yieldcurve(pybind11::module& m) {
   >(sub, "fittingmethod")
     ;
 
-/*   py::class_<
+  py::class_<
       ql::CubicBSplinesFitting
-    ,  
+    , ql::FittedBondDiscountCurve::FittingMethod
   >(sub, "cubicbsplinefitting")
-    ; */
+  .def(py::init<>([](
+        const std::vector<ql::Time>& knots
+      , bool constrainAtZero
+      , Eigen::Ref<const Eigen::VectorXd> weights
+      , const std::shared_ptr<ql::OptimizationMethod>& optimizer
+      , Eigen::Ref<const Eigen::VectorXd> l2
+      , ql::Real minCutoffTime
+      , ql::Real maxCutoffTime
+    ) {
+      
+      auto _weigths = ql::Array();
+      auto _l2      = ql::Array();
+
+      return ql::CubicBSplinesFitting(
+            knots, constrainAtZero, _weigths
+          , optimizer, _l2
+          , minCutoffTime
+          , maxCutoffTime
+        );
+    })
+    , py::arg("knots")
+    , py::arg("contrainatzero") = true
+    , py::arg("weights") = Eigen::VectorXd()
+    , py::arg("optimizer") = std::shared_ptr<ql::OptimizationMethod>()
+    , py::arg("l2") = Eigen::VectorXd()
+    , py::arg("mincutofftime") = 0.0
+    , py::arg("maxcutofftime") = QL_MAX_REAL
+    )
+    ;
 
   py::class_<
       ql::YieldTermStructure

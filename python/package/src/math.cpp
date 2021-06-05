@@ -14,12 +14,20 @@ void init_submodule_math(pybind11::module& m) {
 
   auto sub = m.def_submodule("_math");
 
-  py::class_<ql::OptimizationMethod>(sub, "optimizationmethod")
+  py::class_<
+      ql::OptimizationMethod
+    , std::shared_ptr<ql::OptimizationMethod>
+  >(sub, "optimizationmethod")
     ;
 
-  py::class_<ql::Simplex>(sub, "simplex")
+  py::class_<
+      ql::Simplex
+    , std::shared_ptr<ql::Simplex>
+    , ql::OptimizationMethod
+  >(sub, "simplex")
     .def(py::init<ql::Real>()
-    , py::arg("lambda") = 1.0)
+    , py::arg("lambda") = 1.0
+    )
     ;
   
   py::class_<steven::rootfinder>(sub, "rootfinder")

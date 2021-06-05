@@ -45,3 +45,11 @@ add_py_unittest(
 	DEPENDS steven.python.package.import
 )
 
+add_py_unittest(
+	EXEC ${PYTHON_EXECUTABLE} 
+	NAME test_create_bondhelper
+	CLASS test_termstructure 
+	FILE test
+	PYTHONPATH ${PYTHONPATH_TESTSUITE}
+	DEPENDS steven.python.package.import
+)

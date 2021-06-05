@@ -276,7 +276,15 @@ PYBIND11_MODULE(_steven, m) {
     .def("error", &ql::Instrument::errorEstimate)
     ;
 
-  py::class_<ql::FixedRateBond, std::shared_ptr<ql::FixedRateBond>, ql::Instrument>(m, "fixedratebond")
+  py::class_<
+      ql::Bond
+    , std::shared_ptr<ql::Bond>
+    , ql::Instrument
+  >(m, "bond")
+    ;
+
+  
+  py::class_<ql::FixedRateBond, std::shared_ptr<ql::FixedRateBond>, ql::Bond>(m, "fixedratebond")
     .def(py::init<
           ql::Natural
         , ql::Real
@@ -310,7 +318,7 @@ PYBIND11_MODULE(_steven, m) {
     )
     ;
 
-  py::class_<ql::ZeroCouponBond, std::shared_ptr<ql::ZeroCouponBond>, ql::Instrument>(m, "zerocouponbond")
+  py::class_<ql::ZeroCouponBond, std::shared_ptr<ql::ZeroCouponBond>, ql::Bond>(m, "zerocouponbond")
     .def(py::init<
           ql::Natural
         , const ql::Calendar&

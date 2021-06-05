@@ -99,6 +99,27 @@ class test_termstructure(unittest.TestCase):
   
     self.assertIsInstance(b, zerocouponbond)
 
+  def test_create_bondhelper(self):
+
+    from steven import date
+    from steven.calendars import unitedstates
+    from steven import zerocouponbond
+    from steven.yieldcurve import bondhelper 
+    from steven.quotes import simplequote
+    from steven.handles import quote as hquote
+
+    start = date(2021, 1, 8)
+    end   = date(2031, 1, 8)
+    cdr   = unitedstates()
+
+    b = zerocouponbond(settlementdays=1, calendar=cdr, faceamount=100.0, maturity=end, issuedate=start)
+
+    q   = simplequote(99.987)
+    h   = hquote(q)
+    hlp = bondhelper(h, b)
+
+    self.assertIsInstance(hlp, bondhelper)
+
   def test_create_blackconstantvoltermstruture(self):
 
     from steven import handles

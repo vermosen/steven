@@ -1,5 +1,7 @@
 #include "yieldcurve.h"
 
+#include <ql/instruments/bond.hpp>
+#include <ql/termstructures/yield/bondhelpers.hpp>
 #include <ql/termstructures/yield/flatforward.hpp>
 
 namespace ql = QuantLib;
@@ -10,6 +12,12 @@ void init_submodule_yieldcurve(pybind11::module& m) {
 
   auto sub = m.def_submodule("_yieldcurve");
   sub.doc() = "yieldcurve submodule";
+
+  py::enum_<ql::Bond::Price::Type>(sub, "bondpricetype")
+    .value("clean", ql::Bond::Price::Type::Clean)
+    .value("dirty", ql::Bond::Price::Type::Dirty)
+    .export_values()
+    ;
 
   py::class_<
       ql::YieldTermStructure
@@ -40,5 +48,16 @@ void init_submodule_yieldcurve(pybind11::module& m) {
     .def(py::init<const ql::Date&, ql::Rate, const ql::DayCounter&, ql::Compounding>())
     ;
 
+  py::class_<
+      ql::BondHelper
+  >(sub, "bondhelper")
+  .def(py::init<
+          ql::Handle<ql::Quote>
+        , std::shared_ptr<ql::Bond>&
+        , ql::Bond::Price::Type>()
+        , py::arg("quote")
+        , py::arg("bond")
+        , py::arg("pricetype") = ql::Bond::Price::Type::Clean)
+  ;
   
 }

@@ -49,6 +49,56 @@ class test_termstructure(unittest.TestCase):
 
     self.assertIsInstance(sdl, schedule)
 
+  def test_create_fixedratebond(self):
+
+    from steven import date, timeunit
+    from steven.calendars import unitedstates
+    from steven import businessdayconvention as bdc
+    from steven import period, schedule, dategenerationrule as drule
+    from steven import fixedratebond
+    from steven.daycounters import actual365
+
+    start = date(2021, 1, 8)
+    end   = date(2031, 1, 8)
+
+    tenor = period(6, timeunit.months)
+    cdr = unitedstates()
+
+    sdl = schedule(
+      start, end, 
+      tenor, cdr, 
+      bdc.following, 
+      bdc.following, 
+      drule.backward, False
+    )
+
+    b = fixedratebond(
+        settlementdays=2
+      , faceamount=100.0
+      , schedule=sdl
+      , coupons=[0.025]
+      , accrualdaycounter=actual365())
+
+    self.assertIsInstance(b, fixedratebond)
+
+  def test_create_zerocouponbond(self):
+
+    from steven import date
+    from steven.calendars import unitedstates
+    from steven import zerocouponbond
+
+    start       = date(2021, 1, 8)
+    end         = date(2031, 1, 8)
+    cdr = unitedstates()
+
+    b = zerocouponbond(settlementdays=1, 
+      calendar=cdr, 
+      faceamount=100.0, 
+      maturity=end, 
+      issuedate=start)
+  
+    self.assertIsInstance(b, zerocouponbond)
+
   def test_create_blackconstantvoltermstruture(self):
 
     from steven import handles

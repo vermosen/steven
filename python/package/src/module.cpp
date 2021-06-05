@@ -15,6 +15,8 @@
 #include <ql/quotes/simplequote.hpp>
 #include <ql/instruments/payoffs.hpp>
 #include <ql/instruments/vanillaoption.hpp>
+#include <ql/instruments/bonds/fixedratebond.hpp>
+#include <ql/instruments/bonds/zerocouponbond.hpp>
 #include <ql/time/calendars/unitedstates.hpp>
 #include <ql/time/daycounters/actual360.hpp>
 #include <ql/time/daycounters/actual365fixed.hpp>
@@ -131,13 +133,13 @@ PYBIND11_MODULE(_steven, m) {
 
   py::class_<ql::DayCounter>(m, "daycounter")
     .def("yearfraction", [](
-        ql::DayCounter& dc, const ql::Date& start, const ql::Date& end) {
-          return dc.yearFraction(start, end, ql::Date(), ql::Date());
+        ql::DayCounter& dc, const ql::Date& start, const ql::Date& end, const ql::Date& refstart, const ql::Date& refend) {
+          return dc.yearFraction(start, end, refstart, refend);
         }
       , py::arg("start")
       , py::arg("end")
-    /*, py::arg("refstart") = ql::Date() // warning ! when registering, create bugs with date __repr__ method
-      , py::arg("refend") = ql::Date() */
+      , py::arg("refstart") = ql::Date() // warning ! when registering, create bugs with date __repr__ method
+      , py::arg("refend") = ql::Date()
     )
     ;
 
@@ -274,6 +276,60 @@ PYBIND11_MODULE(_steven, m) {
     .def("error", &ql::Instrument::errorEstimate)
     ;
 
+  py::class_<ql::FixedRateBond, std::shared_ptr<ql::FixedRateBond>, ql::Instrument>(m, "fixedratebond")
+    .def(py::init<
+          ql::Natural
+        , ql::Real
+        , const ql::Schedule&
+        , const std::vector<ql::Rate>&
+        , const ql::DayCounter&
+        , ql::BusinessDayConvention
+        , ql::Real
+        , const ql::Date&
+        , const ql::Calendar&
+        , const ql::Period&
+        , const ql::Calendar&
+        , ql::BusinessDayConvention
+        , bool 
+        , const ql::DayCounter&
+      >()
+      , py::arg("settlementdays")
+      , py::arg("faceamount")
+      , py::arg("schedule")
+      , py::arg("coupons")
+      , py::arg("accrualdaycounter")
+      , py::arg("paymentconvention") = ql::BusinessDayConvention::Following
+      , py::arg("redemption") = 100.0
+      , py::arg("issuedate") = ql::Date()
+      , py::arg("paymentcalendar") = ql::Calendar()
+      , py::arg("excouponperiod") = ql::Period()
+      , py::arg("excouponcalendar") = ql::Calendar()
+      , py::arg("excouponconvention") = ql::BusinessDayConvention::Unadjusted
+      , py::arg("excouponeom") = false
+      , py::arg("firstperioddaycounter") = ql::DayCounter()
+    )
+    ;
+
+  py::class_<ql::ZeroCouponBond, std::shared_ptr<ql::ZeroCouponBond>, ql::Instrument>(m, "zerocouponbond")
+    .def(py::init<
+          ql::Natural
+        , const ql::Calendar&
+        , ql::Real
+        , const ql::Date&
+        , ql::BusinessDayConvention
+        , ql::Real
+        , const ql::Date&
+      >()
+      , py::arg("settlementdays")
+      , py::arg("calendar")
+      , py::arg("faceamount")
+      , py::arg("maturity")
+      , py::arg("paymentconvention") = ql::BusinessDayConvention::Following
+      , py::arg("redemption") = 100.0
+      , py::arg("issuedate") = ql::Date()
+    )
+    ;
+
   py::class_<ql::VanillaOption, std::shared_ptr<ql::VanillaOption>, ql::Instrument>(m, "vanillaoption")
     .def(py::init<
           std::shared_ptr<ql::StrikedTypePayoff>
@@ -365,7 +421,6 @@ PYBIND11_MODULE(_steven, m) {
 
   py::class_<
       ql::Schedule
-/*     , std::shared_ptr<ql::Schedule> */
   >(m, "schedule")
     .def(py::init<
           const ql::Date&
@@ -387,8 +442,8 @@ PYBIND11_MODULE(_steven, m) {
       , py::arg("terminationDateConvention")
       , py::arg("rule")
       , py::arg("eom")
-      , py::arg("firstDate") // = ql::Date() bugged
-      , py::arg("nextToLastDate") // = ql::Date() bugged
+      , py::arg("firstDate") = ql::Date()
+      , py::arg("nextToLastDate") = ql::Date()
     )
     .def("__str__", [](const ql::Schedule& s) {
 

@@ -53,3 +53,13 @@ add_py_unittest(
 	PYTHONPATH ${PYTHONPATH_TESTSUITE}
 	DEPENDS steven.python.package.import
 )
+
+add_py_unittest(
+	EXEC ${PYTHON_EXECUTABLE} 
+	NAME test_convert_datetime
+	CLASS test_time 
+	FILE test
+	PYTHONPATH ${PYTHONPATH_TESTSUITE}
+	DEPENDS steven.python.package.import
+)
+

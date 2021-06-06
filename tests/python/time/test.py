@@ -31,10 +31,21 @@ class test_time(unittest.TestCase):
       throw = True
 
     self.assertFalse(throw)
-    self.assertIsInstance(result, date)
     self.assertEqual(result.year, d.year)
     self.assertEqual(result.month, d.month)
     self.assertEqual(result.day, d.day)
+
+  def test_convert_datetime(self):
+
+    from steven import date
+    from datetime import datetime
+
+    input = datetime(2021, 10, 1)
+    res = date.from_pydate(input)
+    
+    self.assertEqual(res.year, 2021)
+    self.assertEqual(res.month, 10)
+    self.assertEqual(res.day, 1)
 
   def test_print_date(self):
 
@@ -63,7 +74,7 @@ class test_time(unittest.TestCase):
 
   def test_act360_yearfraction(self):
 
-    from steven import date, businessdayconvention, timeunit
+    from steven import date
     from steven.daycounters import actual360
 
     dc = actual360()

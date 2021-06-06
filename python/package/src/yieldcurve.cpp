@@ -41,7 +41,7 @@ void init_submodule_yieldcurve(pybind11::module& m) {
       , ql::Real maxCutoffTime
     ) {
       
-      auto _weigths = ql::Array();
+      auto _weigths = ql::Array(); // TODO: convert eigen array to ql
       auto _l2      = ql::Array();
 
       return ql::CubicBSplinesFitting(
@@ -98,10 +98,11 @@ void init_submodule_yieldcurve(pybind11::module& m) {
           ql::Handle<ql::Quote>
         , std::shared_ptr<ql::Bond>&
         , ql::Bond::Price::Type>()
-        , py::arg("quote")
-        , py::arg("bond")
-        , py::arg("pricetype") = ql::Bond::Price::Type::Clean)
-  ;
+      , py::arg("quote")
+      , py::arg("bond")
+      , py::arg("pricetype") = ql::Bond::Price::Type::Clean
+      )
+    ;
 
   py::class_<
       ql::FittedBondDiscountCurve
@@ -118,8 +119,7 @@ void init_submodule_yieldcurve(pybind11::module& m) {
         , ql::Real lambda
         , ql::Size maxstat) {
 
-          // TODO: convert eigen array to ql
-          auto arr = ql::Array();
+          auto arr = ql::Array(); // TODO: convert eigen array to ql
 
           return ql::FittedBondDiscountCurve(settlementDays
             , calendar, bonds, dc, method

@@ -6,7 +6,7 @@ if sys.version_info < (3, 9):
 else:
   from zoneinfo import ZoneInfo
 
-from ._steven import date, timeunit, businessdayconvention
+from ._steven import date as _date, timeunit, businessdayconvention
 from ._steven import option_type, compounding, frequency
 from ._steven import set_evaluation_date, get_evaluation_date
 from ._steven import blackvoltermstructure, blackconstantvol
@@ -24,6 +24,13 @@ class settings(object):
   def value_date(self, date):
     set_evaluation_date(date)
 
+
+class date(_date):
+
+  @staticmethod
+  def from_pydate(dt):
+    # TODO dispatch according to different date type
+    return _date(dt.year, dt.month, dt.day)
 
 __all__ = [ 
     'date', 'timeunit', 'businessdayconvention'

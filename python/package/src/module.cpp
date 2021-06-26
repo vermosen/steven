@@ -359,7 +359,6 @@ PYBIND11_MODULE(_steven, m) {
         } else {
           throw std::logic_error("wrong payoff type passed");
         }
-        
       }
     )
     ;

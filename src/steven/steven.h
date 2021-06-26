@@ -1,3 +1,4 @@
+#pragma once
 #ifndef STEVEN_H
 #define STEVEN_H
 
